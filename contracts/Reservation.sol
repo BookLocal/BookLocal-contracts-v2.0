@@ -12,6 +12,7 @@ contract Reservation {
      *  Events
      */
     event Deposit(address indexed sender, uint256 value);
+    event CheckOut(address indexed guest);
 
     /**************************************************
      *  Storage
@@ -93,6 +94,8 @@ contract Reservation {
         if (extra > 0) {
             guest.transfer(extra);
         }
+
+        emit CheckOut(guest);
 
         // delete contract
         selfdestruct(bookLocalWallet);

@@ -65,20 +65,20 @@ contract BookLocal {
     /**************************************************
      *  External
      */
-    function settle(address _reservationAddr)
-        senderIsAdmin
-        external
-    {
-        Reservation _reservation = Reservation(_reservationAddr);
-        _reservation.checkOut();
-    }
-
     function newHotel(address[] _owners, address _wallet)
         external
         returns (address hotel)
     {
         hotel = new Hotel(_owners, _wallet, address(this));
         _registerHotel(hotel);
+    }
+
+    function settle(address _reservationAddr)
+        senderIsAdmin
+        external
+    {
+        Reservation _reservation = Reservation(_reservationAddr);
+        _reservation.checkOut();
     }
 
     function addAdmins(address[] _admins)
