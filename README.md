@@ -12,7 +12,7 @@ Then, in a new terminal, change back into this folder and type:
 ```
 truffle test
 ```
-It should pass all 25 tests. 
+It should pass all tests without compiler warning. If warnings appear or a test fails, please raise an issue on this repo! 
 
 ## Contents
 For a method overview, see "Interfaces" folder. A general overview of the file structure is as follows:
