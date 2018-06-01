@@ -9,7 +9,9 @@ cd BookLocal-contracts-v2.0
 truffle dev
 ```
 Then, in a new terminal, change back into this folder and type:
-`truffle test`
+```
+truffle test
+```
 It should pass all 25 tests. 
 
 ## Contents
