@@ -3,7 +3,7 @@ var Hotel = artifacts.require('Hotel');
 var RoomType = artifacts.require('RoomType');
 var Reservation = artifacts.require('Reservation');
 
-contract('Reservation with current checkIn', function([blWallet,hotelWallet,guestWallet,attacker]) {
+contract('Reservation with checkIn date today', function([blWallet,hotelWallet,guestWallet,attacker]) {
 
     let bookLocal;
     let hotelAddress;

@@ -61,5 +61,4 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
         const available = await roomType.getAvailability(checkIn);
         assert.equal(available, 10);
     })
-
 })
