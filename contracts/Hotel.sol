@@ -142,19 +142,18 @@ contract Hotel {
         payable
     {
         address _roomTypeAddr = roomTypes[_roomType];
-        RoomType room = RoomType(_roomTypeAddr);
-        uint256 _pricePerNight = room.getPrice();
+        RoomType _room = RoomType(_roomTypeAddr);
 
-        uint256 _duration = _lengthOfReservation(_checkIn, _checkOut);
-        uint256 _price = _calculateReservationPrice(_pricePerNight, _duration);
-
+        uint256 _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
         require(msg.value >= _price);
+
         require(hasAvailability(_roomType, _checkIn, _checkOut));
-        //require(_isFuture(_checkIn, room));
+        require(_isNotPast(_checkIn, _room));
 
         address _bookLocal = bookLocal;
         address _hotel = address(this);
         address _guest = msg.sender;
+        uint256 _minRentTime = _room.getMinRentTime();
 
         address _reservation = new Reservation(
             _bookLocal,
@@ -162,13 +161,23 @@ contract Hotel {
             _guest,
             _checkIn,
             _checkOut,
-            _price
+            _price,
+            _minRentTime
         );
 
         _reservation.transfer(msg.value);
         _recordReservation(_reservation, _guest, _checkIn);
-        room.addReservation(_checkIn, _checkOut);
+        _room.addReservation(_checkIn, _checkOut);
         emit Reserve(_reservation, _roomTypeAddr, _checkIn, _checkOut);
+    }
+
+    function access(address _reservationAddr, address _potentialGuest)
+        external
+        view
+        returns (bool)
+    {
+        Reservation _reservation = Reservation(_reservationAddr);
+        return _reservation.canCheckIn(_potentialGuest);
     }
 
     function settle(address _reservationAddr)
@@ -177,6 +186,14 @@ contract Hotel {
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.checkOut();
+    }
+
+    function cancel(address _reservationAddr)
+        senderIsAdmin
+        external
+    {
+        Reservation _reservation = Reservation(_reservationAddr);
+        _reservation.cancel();
     }
 
     function getReservationByCheckInDay(uint256 _day)
@@ -257,7 +274,7 @@ contract Hotel {
         return true;
     }
 
-    function getCurrentTimeInProperUnits(uint256 _roomType)
+    function getCurrentAdjustedTime(uint256 _roomType)
         public
         view
         returns (uint256)
@@ -286,14 +303,14 @@ contract Hotel {
         roomTypes.push(_roomType);
     }
 
-    function _isFuture(uint256 _reservationTime, RoomType _room)
+    function _isNotPast(uint256 _reservationTime, RoomType _room)
         internal
         view
         returns (bool)
     {
         uint256 _minRentTime = _room.getMinRentTime();
-        uint256 _adjustedTime = now.div(_minRentTime);
-        return _adjustedTime > _reservationTime;
+        uint256 _adjustedCurrentTime = now.div(_minRentTime);
+        return _reservationTime >= _adjustedCurrentTime;
     }
 
     function _lengthOfReservation(uint256 _checkIn, uint256 _checkOut)
@@ -305,11 +322,13 @@ contract Hotel {
         return _checkOut.sub(_checkIn);
     }
 
-    function _calculateReservationPrice(uint256 _price, uint256 _duration)
+    function _calculateReservationPrice(RoomType _room, uint256 _checkIn, uint256 _checkOut)
         internal
-        pure
+        view
         returns (uint256)
     {
-        return _price.mul(_duration);
+        uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
+        uint256 _pricePerNight = _room.getPrice();
+        return _pricePerNight.mul(_lengthOfStay);
     }
 }
