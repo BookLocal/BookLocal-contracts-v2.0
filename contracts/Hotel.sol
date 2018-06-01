@@ -156,6 +156,7 @@ contract Hotel {
         uint256 _minRentTime = _room.getMinRentTime();
 
         address _reservation = new Reservation(
+            _roomTypeAddr,
             _bookLocal,
             _hotel,
             _guest,
@@ -167,7 +168,7 @@ contract Hotel {
 
         _reservation.transfer(msg.value);
         _recordReservation(_reservation, _guest, _checkIn);
-        _room.addReservation(_checkIn, _checkOut);
+        _room.addReservation(_reservation, _checkIn, _checkOut);
         emit Reserve(_reservation, _roomTypeAddr, _checkIn, _checkOut);
     }
 

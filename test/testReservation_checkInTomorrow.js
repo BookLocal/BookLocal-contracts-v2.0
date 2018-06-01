@@ -53,5 +53,13 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
         assert(await reservation.cancel({from:guestWallet}));
     })
 
+    it('should update availability after a guest cancels', async() => {
+        await reservation.cancel({from:guestWallet});
+        const roomTypeAddr = await hotel.getRoomTypeAddress(roomTypeId);
+        const roomType = await RoomType.at(roomTypeAddr);
+
+        const available = await roomType.getAvailability(checkIn);
+        assert.equal(available, 10);
+    })
 
 })

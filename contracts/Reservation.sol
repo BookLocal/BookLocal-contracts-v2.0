@@ -3,6 +3,7 @@ pragma solidity ^0.4.20;
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './BookLocal.sol';
 import './Hotel.sol';
+import './RoomType.sol';
 
 contract Reservation {
 
@@ -25,6 +26,7 @@ contract Reservation {
     uint256 checkInDate;
     uint256 checkOutDate;
 
+    address roomTypeAddr;
     uint256 minRentTime;
     uint256 reservationPrice;
     uint256 bookLocalPctShare;
@@ -45,6 +47,7 @@ contract Reservation {
      *  Constructor
      */
     constructor(
+        address _roomTypeAddr,
         address _bookLocal,
         address _hotel,
         address _guest,
@@ -55,6 +58,7 @@ contract Reservation {
     )
         public
     {
+        roomTypeAddr = _roomTypeAddr;
         bookLocal = _bookLocal;
         hotel = _hotel;
         guest = _guest;
@@ -95,20 +99,20 @@ contract Reservation {
      */
     function checkOut() isInContract afterCheckIn external {
 
-        uint256 bookLocalShare = reservationPrice.div(bookLocalPctShare);
-        uint256 hotelShare = reservationPrice.sub(bookLocalShare);
-        uint256 extra = address(this).balance.sub(reservationPrice);
+        uint256 _bookLocalShare = reservationPrice.div(bookLocalPctShare);
+        uint256 _hotelShare = reservationPrice.sub(_bookLocalShare);
+        uint256 _extra = address(this).balance.sub(reservationPrice);
 
-        require(bookLocalShare.add(hotelShare).add(extra) == address(this).balance);
+        require(_bookLocalShare.add(_hotelShare).add(_extra) == address(this).balance);
 
         address bookLocalWallet = getBookLocalWallet();
         address hotelWallet = getHotelWallet();
 
         // make transfers
-        hotelWallet.transfer(hotelShare);
-        bookLocalWallet.transfer(bookLocalShare);
-        if (extra > 0) {
-            guest.transfer(extra);
+        hotelWallet.transfer(_hotelShare);
+        bookLocalWallet.transfer(_bookLocalShare);
+        if (_extra > 0) {
+            guest.transfer(_extra);
         }
 
         emit CheckOut(guest, hotel);
@@ -120,22 +124,25 @@ contract Reservation {
     function cancel() isInContract beforeCheckIn external {
 
         // for a cancelled room, charge less
-        uint256 cancelPrice = _calculateCancelPrice();
+        uint256 _cancelPrice = _calculateCancelPrice();
 
-        uint256 bookLocalShare = cancelPrice.div(bookLocalPctShare);
-        uint256 hotelShare = cancelPrice.sub(bookLocalShare);
-        uint256 extra = address(this).balance.sub(cancelPrice);
+        uint256 _bookLocalShare = _cancelPrice.div(bookLocalPctShare);
+        uint256 _hotelShare = _cancelPrice.sub(_bookLocalShare);
+        uint256 _extra = address(this).balance.sub(_cancelPrice);
+        require(_bookLocalShare.add(_hotelShare).add(_extra) == address(this).balance);
 
-        require(bookLocalShare.add(hotelShare).add(extra) == address(this).balance);
+        // add room back to inventory
+        RoomType _room = RoomType(roomTypeAddr);
+        _room.cancelReservation(checkInDate, checkOutDate);
 
         address bookLocalWallet = getBookLocalWallet();
         address hotelWallet = getHotelWallet();
 
         // make transfers
-        hotelWallet.transfer(hotelShare);
-        bookLocalWallet.transfer(bookLocalShare);
-        if (extra > 0) {
-            guest.transfer(extra);
+        hotelWallet.transfer(_hotelShare);
+        bookLocalWallet.transfer(_bookLocalShare);
+        if (_extra > 0) {
+            guest.transfer(_extra);
         }
 
         emit Cancel(guest, hotel);
@@ -168,6 +175,18 @@ contract Reservation {
     function getHotelWallet() public view returns (address) {
         Hotel _hotel = Hotel(hotel);
         return _hotel.getWallet();
+    }
+
+    function getRoomType() public view returns (address) {
+        return roomTypeAddr;
+    }
+
+    function getCheckIn() public view returns (uint256) {
+        return checkInDate;
+    }
+
+    function getCheckOut() public view returns (uint256) {
+        return checkOutDate;
     }
 
     function getBalance() public view returns (uint256) {

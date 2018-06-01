@@ -134,6 +134,4 @@ contract('Reservation with current checkIn', function([blWallet,hotelWallet,gues
             assert(revertFound, `Expected "revert", got ${error} instead`);
         }
     })
-
-
 })

@@ -27,6 +27,9 @@ contract RoomType {
     mapping (uint256 => uint256) checkOuts;  // date => numCheckOuts
     mapping (uint256 => uint256) occupied;   // date => numOccupied
 
+    // track active reservations
+    mapping (address => bool) isReservation;
+
     /**************************************************
      *  Constructor
      */
@@ -52,6 +55,11 @@ contract RoomType {
         _;
     }
 
+    modifier onlyReservation() {
+        require(isReservation[msg.sender]);
+        _;
+    }
+
     /**************************************************
      *  External
      *
@@ -65,17 +73,34 @@ contract RoomType {
     }
 
     function addReservation(
+        address _reservation,
         uint256 _checkIn,
         uint256 _checkOut
     )
         onlyHotel
         external
     {
+        isReservation[_reservation] = true;
         checkIns[_checkIn] ++;
         checkOuts[_checkOut] ++;
 
         for (uint i=_checkIn; i<_checkOut; i++) {
             occupied[i] ++;
+        }
+    }
+
+    function cancelReservation(
+        uint256 _checkIn,
+        uint256 _checkOut
+    )
+        onlyReservation
+        external
+    {
+        checkIns[_checkIn] --;
+        checkOuts[_checkOut] --;
+
+        for (uint i=_checkIn; i<_checkOut; i++) {
+            occupied[i] --;
         }
     }
 
