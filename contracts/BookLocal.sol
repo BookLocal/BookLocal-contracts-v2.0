@@ -1,5 +1,11 @@
 pragma solidity ^0.4.20;
 
+/*
+ *  Author... Steven Lee
+ *  Email.... steven@booklocal.in
+ *  Date..... 5.30.18
+ */
+
 import './Hotel.sol';
 
 contract BookLocal {
