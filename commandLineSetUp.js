@@ -1,3 +1,9 @@
+// define contracts for JS
+var BookLocal = artifacts.require('./BookLocal.sol');
+var Hotel = artifacts.require('./Hotel.sol');
+var RoomType = artifacts.require('./RoomType.sol');
+var Reservation = artifacts.require('./Reservation.sol');
+
 // attach to BookLocal
 let bl, hotelAddr, hotel, hotelOwner, hotelWallet;
 let roomTypeAddr, roomType, reservationAddrs, reservation;
@@ -6,7 +12,10 @@ let currentDay, checkOut, guest;
 blOwner = web3.eth.accounts[0];
 hotelOwner = web3.eth.accounts[1];
 hotelWallet = web3.eth.accounts[2];
-guest = web3.eth.accounts[3];
+guest1 = web3.eth.accounts[3];
+guest2 = web3.eth.accounts[4];
+guest3 = web3.eth.accounts[5];
+guest4 = web3.eth.accounts[6];
 
 ///////////////
 /* BOOKLOCAL */
@@ -16,7 +25,7 @@ guest = web3.eth.accounts[3];
 BookLocal.deployed().then(function(res) {bl = res});
 
 // deploy new hotel
-bl.newHotel([hotelOwner],hotelWallet)
+bl.newHotel([hotelOwner],hotelWallet);
 
 // get hotel address
 // note hotel is stored in an mapping from hotelID to address.
