@@ -1,0 +1,25 @@
+{
+  "name": "openzeppelin-solidity",
+  "version": "1.10.0",
+  "description": "Secure smart contract templates",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "openzeppelin-solidity": "^1.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BookLocal/BookLocal-contracts-v2.0.git"
+  },
+  "author": "Steven Lee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BookLocal/BookLocal-contracts-v2.0/issues"
+  },
+  "homepage": "https://github.com/BookLocal/BookLocal-contracts-v2.0#readme"
+}
