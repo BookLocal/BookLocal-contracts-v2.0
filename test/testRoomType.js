@@ -70,4 +70,11 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
             assert(revertFound, `Expected "revert", got ${error} instead`);
         }
     })
+
+    it('should let you get room type information', async() => {
+        const price = await roomType.getPrice();
+        const sleeps = await roomType.getNumSleeps();
+        assert.equal(price.toNumber(), 100);
+        assert.equal(sleeps.toNumber(), 2);
+    })
 })

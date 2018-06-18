@@ -219,6 +219,21 @@ contract Hotel {
         return reservationsByGuest[_guest];
     }
 
+    function getRoomInfo(address _roomTypeAddr)
+        external
+        view
+        returns
+    (
+        uint256 _sleeps,
+        uint256 _price,
+        uint256 _minRentTime)
+    {
+        RoomType _room = RoomType(_roomTypeAddr);
+        _sleeps = _room.getNumSleeps();
+        _price = _room.getPrice();
+        _minRentTime = _room.getMinRentTime();
+    }
+
     /**************************************************
      *  Public
      */
