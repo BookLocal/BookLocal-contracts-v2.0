@@ -24,7 +24,6 @@ contract RoomType {
 
     uint256 price;
     uint256 sleeps;
-    uint256 beds;
     uint256 minRentTime = 3600*24;           // minimum time in seconds
 
     // availability information
@@ -132,6 +131,10 @@ contract RoomType {
         uint256 _available = inventory.sub(_occupied);
 
         return _available;
+    }
+
+    function getNumSleeps() public view returns (uint256) {
+        return sleeps;
     }
 
     function getRoomTypeInventory() public view returns (uint256) {
