@@ -25,6 +25,7 @@ module.exports = async function(callback) {
 
   // access bookLocal
   // await goes in here somewhere.
+  BookLocal.deployed().then(function(res) {bl = res});
   BookLocal.deployed().then(await function(res) {bl = res});
   //or
   bl = await BookLocal.deployed().then(function(res) {return res});
