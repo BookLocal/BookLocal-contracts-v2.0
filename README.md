@@ -6,6 +6,7 @@ Change into your favorite working directory, and type:
 ``` 
 git clone https://github.com/BookLocal/BookLocal-contracts-v2.0
 cd BookLocal-contracts-v2.0
+npm install
 truffle dev
 ```
 Then, in a new terminal, change back into this folder and type:
