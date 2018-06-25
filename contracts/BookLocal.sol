@@ -101,6 +101,34 @@ contract BookLocal {
         bookLocalAdmins.push(_admin);
     }
 
+    function removeAdmin(address[] _admins)
+        senderIsOwner
+        external
+    {
+        uint256 numToRemove = _admins.length;
+        for(uint256 i=0; i<numToRemove; i++) {
+            isAdmin[_admins[i]] = false;
+        }
+    }
+
+    function getAdmins()
+        external
+        senderIsAdmin
+        view
+        returns (address[])
+    {
+        return bookLocalAdmins;
+    }
+
+    function getOwners()
+        external
+        senderIsOwner
+        view
+        returns (address[])
+    {
+        return bookLocalOwners;
+    }
+
     /**************************************************
      *  Public
      */

@@ -91,7 +91,7 @@ contract Hotel {
      *  External Functions
      */
 
-    // Owner only
+    /* owner only */
     function addRoomType(
         uint256 _price,
         uint256 _sleeps,
@@ -105,9 +105,8 @@ contract Hotel {
         _recordRoomType(_roomType);
     }
 
-    // Admin only
     function addAdmins(address[] _admins)
-        senderIsAdmin
+        senderIsOwner
         external
     {
         address _admin;
@@ -120,6 +119,17 @@ contract Hotel {
         hotelAdmins.push(_admin);
     }
 
+    function removeAdmin(address[] _admins)
+        senderIsOwner
+        external
+    {
+        uint256 numToRemove = _admins.length;
+        for(uint256 i=0; i<numToRemove; i++) {
+            isAdmin[_admins[i]] = false;
+        }
+    }
+
+    /* admin only */
     function changeReservationPrice(address _reservationAddr, uint256 _newPrice)
         senderIsAdmin
         external
@@ -138,7 +148,7 @@ contract Hotel {
         emit ChangeRoomPrice(_roomTypeAddr, _newPrice);
     }
 
-    // Renting (i.e. ERC809)
+    /* ERC809 renting */
     function reserve(
         uint256 _roomType,
         uint256 _checkIn,
@@ -150,9 +160,13 @@ contract Hotel {
         address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
 
-        uint256 _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
+        // make sure renter sends enough money
+        // this function also checks that checkout is after checkin
+        uint256 _price = calculateReservationPrice(_room, _checkIn, _checkOut);
         require(msg.value >= _price);
 
+        // make sure there is availability
+        // and that check in is in the future
         require(hasAvailability(_roomType, _checkIn, _checkOut));
         require(_isNotPast(_checkIn, _room));
 
@@ -161,6 +175,9 @@ contract Hotel {
         address _guest = msg.sender;
         uint256 _minRentTime = _room.getMinRentTime();
 
+        // make new Reservation
+        // transfer the money to the new address
+        // record the reservation for both hotel and roomType
         address _reservation = new Reservation(
             _roomTypeAddr,
             _bookLocal,
@@ -232,6 +249,24 @@ contract Hotel {
         _sleeps = _room.getNumSleeps();
         _price = _room.getPrice();
         _minRentTime = _room.getMinRentTime();
+    }
+
+    function getAdmins()
+        external
+        senderIsAdmin
+        view
+        returns (address[])
+    {
+        return hotelAdmins;
+    }
+
+    function getOwners()
+        external
+        senderIsOwner
+        view
+        returns (address[])
+    {
+        return hotelOwners;
     }
 
     /**************************************************
@@ -307,6 +342,16 @@ contract Hotel {
         return now.div(_minRentTime);
     }
 
+    function calculateReservationPrice(RoomType _room, uint256 _checkIn, uint256 _checkOut)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
+        uint256 _pricePerNight = _room.getPrice();
+        return _pricePerNight.mul(_lengthOfStay);
+    }
+
     /**************************************************
      *  Internal
      */
@@ -342,15 +387,5 @@ contract Hotel {
     {
         require(_checkIn < _checkOut);
         return _checkOut.sub(_checkIn);
-    }
-
-    function _calculateReservationPrice(RoomType _room, uint256 _checkIn, uint256 _checkOut)
-        internal
-        view
-        returns (uint256)
-    {
-        uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
-        uint256 _pricePerNight = _room.getPrice();
-        return _pricePerNight.mul(_lengthOfStay);
     }
 }
