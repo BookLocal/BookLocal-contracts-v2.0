@@ -115,17 +115,41 @@ contract Hotel {
             _admin = _admins[i];
             require(!isAdmin[_admin] && _admin != address(0));
             isAdmin[_admin] = true;
+            hotelAdmins.push(_admin);
         }
-        hotelAdmins.push(_admin);
     }
 
-    function removeAdmin(address[] _admins)
+    function addOwners(address[] _owners)
+        senderIsOwner
+        external
+    {
+        address _owner;
+        uint numOwners = _owners.length;
+        for(uint i=0; i<numOwners; i++) {
+            _owner = _owners[i];
+            require(!isOwner[_owner] && _owner != address(0));
+            isOwner[_owner] = true;
+            hotelOwners.push(_owner);
+        }
+    }
+
+    function removeAdmins(address[] _admins)
         senderIsOwner
         external
     {
         uint256 numToRemove = _admins.length;
         for(uint256 i=0; i<numToRemove; i++) {
             isAdmin[_admins[i]] = false;
+        }
+    }
+
+    function removeOwners(address[] _owners)
+        senderIsOwner
+        external
+    {
+        uint256 numToRemove = _owners.length;
+        for(uint256 i=0; i<numToRemove; i++) {
+            isOwner[_owners[i]] = false;
         }
     }
 
@@ -146,6 +170,38 @@ contract Hotel {
         RoomType _roomType = RoomType(_roomTypeAddr);
         _roomType.changePrice(_newPrice);
         emit ChangeRoomPrice(_roomTypeAddr, _newPrice);
+    }
+
+    function getAdmins()
+        external
+        senderIsAdmin
+        view
+        returns (address[])
+    {
+        uint256 numOfAdmins = hotelAdmins.length;
+        address[] memory validAdmins = new address[](numOfAdmins);
+        for(uint256 i=0; i<numOfAdmins; i++) {
+            if (isAdmin[hotelAdmins[i]]) {
+                validAdmins[i] = hotelAdmins[i];
+            }
+        }
+        return validAdmins;
+    }
+
+    function getOwners()
+        external
+        senderIsAdmin
+        view
+        returns (address[])
+    {
+        uint256 numOfOwners = hotelOwners.length;
+        address[] memory validOwners = new address[](numOfOwners);
+        for(uint256 i=0; i<numOfOwners; i++) {
+            if (isOwner[hotelOwners[i]]) {
+                validOwners[i] = hotelOwners[i];
+            }
+        }
+        return validOwners;
     }
 
     /* ERC809 renting */
@@ -249,24 +305,6 @@ contract Hotel {
         _sleeps = _room.getNumSleeps();
         _price = _room.getPrice();
         _minRentTime = _room.getMinRentTime();
-    }
-
-    function getAdmins()
-        external
-        senderIsAdmin
-        view
-        returns (address[])
-    {
-        return hotelAdmins;
-    }
-
-    function getOwners()
-        external
-        senderIsOwner
-        view
-        returns (address[])
-    {
-        return hotelOwners;
     }
 
     /**************************************************

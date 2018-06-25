@@ -92,16 +92,30 @@ contract BookLocal {
         external
     {
         address _admin;
-        uint numOwners = _admins.length;
-        for(uint i=0; i<numOwners; i++) {
+        uint numAdmins = _admins.length;
+        for(uint i=0; i<numAdmins; i++) {
             _admin = _admins[i];
             require(!isAdmin[_admin] && _admin != address(0));
             isAdmin[_admin] = true;
+            bookLocalAdmins.push(_admin);
         }
-        bookLocalAdmins.push(_admin);
     }
 
-    function removeAdmin(address[] _admins)
+    function addOwners(address[] _owners)
+        senderIsOwner
+        external
+    {
+        address _owner;
+        uint numOwners = _owners.length;
+        for(uint i=0; i<numOwners; i++) {
+            _owner = _owners[i];
+            require(!isOwner[_owner] && _owner != address(0));
+            isOwner[_owner] = true;
+            bookLocalOwners.push(_owner);
+        }
+    }
+
+    function removeAdmins(address[] _admins)
         senderIsOwner
         external
     {
@@ -111,22 +125,46 @@ contract BookLocal {
         }
     }
 
+    function removeOwners(address[] _owners)
+        senderIsOwner
+        external
+    {
+        uint256 numToRemove = _owners.length;
+        for(uint256 i=0; i<numToRemove; i++) {
+            isOwner[_owners[i]] = false;
+        }
+    }
+
     function getAdmins()
         external
         senderIsAdmin
         view
         returns (address[])
     {
-        return bookLocalAdmins;
+        uint256 numOfAdmins = bookLocalAdmins.length;
+        address[] memory validAdmins = new address[](numOfAdmins);
+        for(uint256 i=0; i<numOfAdmins; i++) {
+            if (isAdmin[bookLocalAdmins[i]]) {
+                validAdmins[i] = bookLocalAdmins[i];
+            }
+        }
+        return validAdmins;
     }
 
     function getOwners()
         external
-        senderIsOwner
+        senderIsAdmin
         view
         returns (address[])
     {
-        return bookLocalOwners;
+        uint256 numOfOwners = bookLocalOwners.length;
+        address[] memory validOwners = new address[](numOfOwners);
+        for(uint256 i=0; i<numOfOwners; i++) {
+            if (isOwner[bookLocalOwners[i]]) {
+                validOwners[i] = bookLocalOwners[i];
+            }
+        }
+        return validOwners;
     }
 
     /**************************************************
