@@ -1,77 +1,96 @@
-// attach to BookLocal
-let bl, hotelAddr, hotel, hotelOwner, hotelWallet;
-let roomTypeAddr, roomType, reservationAddrs, reservation;
-let currentDay, checkOut, guest;
+// define contracts for JS
+var BookLocal = artifacts.require('./BookLocal.sol');
+var Hotel = artifacts.require('./Hotel.sol');
+var RoomType = artifacts.require('./RoomType.sol');
+var Reservation = artifacts.require('./Reservation.sol');
 
-blOwner = web3.eth.accounts[0];
-hotelOwner = web3.eth.accounts[1];
-hotelWallet = web3.eth.accounts[2];
-guest = web3.eth.accounts[3];
+module.exports = async function(callback) {
+  // attach to BookLocal
+  let bl, hotelAddr, hotel, hotelOwner, hotelWallet;
+  let roomTypeAddr, roomType, reservationAddrs, reservation;
+  let currentDay, checkOut, guest;
 
-///////////////
-/* BOOKLOCAL */
-///////////////
+  // assign accounts
+  blOwner = web3.eth.accounts[0];
+  hotelOwner = web3.eth.accounts[1];
+  hotelWallet = web3.eth.accounts[2];
+  guest1 = web3.eth.accounts[3];
+  guest2 = web3.eth.accounts[4];
+  guest3 = web3.eth.accounts[5];
+  guest4 = web3.eth.accounts[6];
 
-// access bookLocal
-BookLocal.deployed().then(function(res) {bl = res});
+  ///////////////
+  /* BOOKLOCAL */
+  ///////////////
 
-// deploy new hotel
-bl.newHotel([hotelOwner],hotelWallet)
+  // access bookLocal
+  // await goes in here somewhere.
+  BookLocal.deployed().then(function(res) {bl = res});
+  BookLocal.deployed().then(await function(res) {bl = res});
+  //or
+  bl = await BookLocal.deployed().then(function(res) {return res});
 
-// get hotel address
-// note hotel is stored in an mapping from hotelID to address.
-// So the first hotel address is looked up at id=1.
-bl.getHotelAddress.call(1).then(function(addr) {hotelAddr = addr;});
+  // deploy new hotel
+  bl.newHotel([hotelOwner],hotelWallet);
 
-///////////
-/* HOTEL */
-///////////
+  // get hotel address
+  // note hotel is stored in an mapping from hotelID to address.
+  // So the first hotel address is looked up at id=1.
+  bl.getHotelAddress.call(1).then(function(addr) {hotelAddr = addr;});
 
-// access hotel
-Hotel.at(hotelAddr).then(function(res) {hotel = res});
+  ///////////
+  /* HOTEL */
+  ///////////
 
-// add room inventory through room type
-hotel.addRoomType(1000, 2, 5, {from:hotelOwner})
+  // access hotel
+  Hotel.at(hotelAddr).then(function(res) {hotel = res});
 
-// check total inventory (should equal 5)
-hotel.getTotalRooms.call().then(function(rooms) {console.log(rooms.toNumber())});
+  // add room inventory through room type
+  hotel.addRoomType(1000, 2, 5, {from:hotelOwner})
 
-// get current time in proper units
-hotel.getCurrentAdjustedTime.call(0).then(function(time) {currentDay = time.toNumber()});
+  // check total inventory (should equal 5)
+  hotel.getTotalRooms.call().then(function(rooms) {console.log(rooms.toNumber())});
 
-// get roomType address and contract
-// note roomType is stored in an array. So the first
-// roomType address is stored at index 0.
-hotel.getRoomTypeAddress.call(0).then(function(addr) {roomTypeAddr = addr});
+  // get current time in proper units
+  hotel.getCurrentAdjustedTime.call(0).then(function(time) {currentDay = time.toNumber()});
 
-// make reservation
-checkOut = currentDay + 1;
-hotel.reserve(0, currentDay, checkOut, {from:guest, value:10000});
+  // get roomType address and contract
+  // note roomType is stored in an array. So the first
+  // roomType address is stored at index 0.
+  hotel.getRoomTypeAddress.call(0).then(function(addr) {roomTypeAddr = addr});
 
-// get reservation address
-hotel.getReservationByCheckInDay.call(currentDay).then(function(array) {reservationAddrs = array});
+  // make reservation
+  checkOut = currentDay + 1;
+  hotel.reserve(0, currentDay, checkOut, {from:guest, value:10000});
 
-/////////////////
-/* RESERVATION */
-/////////////////
+  // get reservation address
+  hotel.getReservationByCheckInDay.call(currentDay).then(function(array) {reservationAddrs = array});
 
-// access reservation
-Reservation.at(reservationAddrs[0]).then(function(res) {reservation = res});
+  /////////////////
+  /* RESERVATION */
+  /////////////////
 
-// make sure we can check in today
-hotel.access.call(reservationAddrs[0],guest).then(function(res) {console.log(res)});
+  // access reservation
+  Reservation.at(reservationAddrs[0]).then(function(res) {reservation = res});
 
-// hotel checks out the guest
-hotel.settle(reservationAddrs[0], {from:hotelOwner});
+  // make sure we can check in today
+  hotel.access.call(reservationAddrs[0],guest).then(function(res) {console.log(res)});
 
-/*
-// Alternatively, the guest could check out like so:
-reservation.checkOut({from:guest});
-*/
+  // hotel checks out the guest
+  hotel.settle(reservationAddrs[0], {from:hotelOwner});
 
-////////////////////////////////////////
-/* ROOMTYPE */// unused, but for example
-////////////////////////////////////////
+  /*
+  // Alternatively, the guest could check out like so:
+  reservation.checkOut({from:guest});
+  */
 
-// access roomtype
-RoomType.at(roomTypeAddr).then(function(res) {roomType = res});
+  ////////////////////////////////////////
+  /* ROOMTYPE */// unused, but for example
+  ////////////////////////////////////////
+
+  // access roomtype
+  RoomType.at(roomTypeAddr).then(function(res) {roomType = res});
+
+  // end the script
+  callback(error);
+}
