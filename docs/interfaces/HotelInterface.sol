@@ -21,6 +21,7 @@ contract HotelInterface {
     function getReservationByGuestAddr(address _guest) external view returns (address[]);
     function getWallet() public view returns (address);
     function getNumOfRoomTypes() public view returns (uint256);
+    // function getRoomTypeAddress(uint256 _type) public view returns (uint256 _beds, uint256 _price);
     function getRoomTypeAddress(uint256 _type) public view returns (address);
     function getAvailability(uint256 _roomType, uint256 _day) public view;
     function getTotalRooms() public view returns (uint256);
