@@ -20,10 +20,9 @@ contract RoomType {
     address hotel;
 
     // room information
-    string description;
-
     uint256 price;
     uint256 sleeps;
+    uint256 beds;
     uint256 minRentTime = 3600*24;           // minimum time in seconds
 
     // availability information
@@ -42,6 +41,7 @@ contract RoomType {
         address _hotel,
         uint256 _price,
         uint256 _sleeps,
+        uint256 _beds,
         uint256 _inventory
     )
         public
@@ -49,6 +49,7 @@ contract RoomType {
         hotel = _hotel;
         price = _price;
         sleeps = _sleeps;
+        beds = _beds;
         inventory = _inventory;
     }
 
@@ -135,6 +136,10 @@ contract RoomType {
 
     function getNumSleeps() public view returns (uint256) {
         return sleeps;
+    }
+
+    function getNumBeds() public view returns (uint256) {
+        return beds;
     }
 
     function getRoomTypeInventory() public view returns (uint256) {

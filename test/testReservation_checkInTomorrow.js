@@ -20,6 +20,7 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
 
         const price = 100;
         const sleeps = 2;
+        const beds = 2;
         const inventory = 10;
 
         // new booklocal and hotel
@@ -29,7 +30,7 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
         hotel = await Hotel.at(hotelAddress);
 
         // add new room
-        await hotel.addRoomType(price, sleeps, inventory, {from:hotelWallet});
+        await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
         // set checkIn for tomorrow
         checkIn = await hotel.getCurrentAdjustedTime(roomTypeId);

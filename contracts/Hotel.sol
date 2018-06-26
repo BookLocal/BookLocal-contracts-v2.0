@@ -95,13 +95,14 @@ contract Hotel {
     function addRoomType(
         uint256 _price,
         uint256 _sleeps,
+        uint256 _beds,
         uint256 _inventory
     )
         senderIsOwner
         external
     {
         address _hotel = address(this);
-        address _roomType = new RoomType(_hotel, _price, _sleeps, _inventory);
+        address _roomType = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
         _recordRoomType(_roomType);
     }
 
@@ -218,7 +219,7 @@ contract Hotel {
 
         // make sure renter sends enough money
         // this function also checks that checkout is after checkin
-        uint256 _price = calculateReservationPrice(_room, _checkIn, _checkOut);
+        uint256 _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
         require(msg.value >= _price);
 
         // make sure there is availability
@@ -298,11 +299,13 @@ contract Hotel {
         returns
     (
         uint256 _sleeps,
+        uint256 _beds,
         uint256 _price,
         uint256 _minRentTime)
     {
         RoomType _room = RoomType(_roomTypeAddr);
         _sleeps = _room.getNumSleeps();
+        _beds = _room.getNumBeds();
         _price = _room.getPrice();
         _minRentTime = _room.getMinRentTime();
     }
@@ -380,14 +383,19 @@ contract Hotel {
         return now.div(_minRentTime);
     }
 
-    function calculateReservationPrice(RoomType _room, uint256 _checkIn, uint256 _checkOut)
+    function getReservationPrice(
+        uint256 _roomType,
+        uint256 _checkIn,
+        uint256 _checkOut
+    )
         public
         view
-        returns (uint256)
+        returns (uint256 _price)
     {
-        uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
-        uint256 _pricePerNight = _room.getPrice();
-        return _pricePerNight.mul(_lengthOfStay);
+        address _roomTypeAddr = roomTypes[_roomType];
+        RoomType _room = RoomType(_roomTypeAddr);
+
+        _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
     }
 
     /**************************************************
@@ -425,5 +433,15 @@ contract Hotel {
     {
         require(_checkIn < _checkOut);
         return _checkOut.sub(_checkIn);
+    }
+
+    function _calculateReservationPrice(RoomType _room, uint256 _checkIn, uint256 _checkOut)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
+        uint256 _pricePerNight = _room.getPrice();
+        return _pricePerNight.mul(_lengthOfStay);
     }
 }

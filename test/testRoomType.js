@@ -17,6 +17,7 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
     beforeEach('setup roomType', async function() {
         const price = 100;
         const sleeps = 2;
+        const beds = 2;
         const inventory = 10;
 
         bookLocal = await BookLocal.new([blWallet],blWallet);
@@ -24,7 +25,7 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
 
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
-        await hotel.addRoomType(price, sleeps, inventory, {from:hotelWallet});
+        await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
         roomTypeAddr = await hotel.getRoomTypeAddress(0);
         roomType = await RoomType.at(roomTypeAddr);
