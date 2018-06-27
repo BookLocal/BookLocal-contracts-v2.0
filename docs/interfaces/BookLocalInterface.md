@@ -43,7 +43,7 @@ External functions are intended to be called outside of the contract they were c
 ```
 
 ```js
-  function geOwners() external returns (address[]);
+  function getOwners() external returns (address[]);
   -> restricted to owner use.
   -> returns all current owners.
   -> view function so costs zero gas.
