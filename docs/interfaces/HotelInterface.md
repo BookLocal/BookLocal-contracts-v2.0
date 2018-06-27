@@ -1,15 +1,56 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
-## Contract Hotel Interface
+# Hotel Interface
+
+## Events
+These events are intended for front end and server use.
 ```js
   event Reserve(address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
-  -> listened for by BE
 ```
-#### access is restricted to hotel owner
+
 ```js
-  function addRoomType(uint256 _price, uint256 _sleeps, uint256 _inventory) external;
+  event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
+```
+
+```js
+  event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
+```
+
+## Functions
+
+#### External
+```js
+  function addRoomType(uint256 _price, uint256 _sleeps, uint256 _beds, uint256 _inventory) external;
+  -> restricted to hotel owners.
   -> called in RoomTypesMolecule
 ```
+
+```js
+  function addAdmins(address[] _admins) external;
+  -> restricted to hotel owners.
+  -> adds hotel admins that can use select functions.
+```
+
+```js
+  function addOwners(address[] _owners) external;
+  -> restricted to hotel owners.
+```
+
+```js
+  function removeAdmins(address[] _admins) external;
+  -> restricted to hotel owners.
+```
+
+```js
+  function removeOwners(address[] _owners) external;
+  -> restricted to hotel owners.
+```
+
+```js
+  function changeRoomTypePrice(address _roomTypeAddr, uint256 _newPrice) external;
+  -> restricted to hotel admins. 
+```
+
 #### access is restricted to hotel admin
 ```js
   function changeReservationPrice(address _reservationAddr, uint256 _newPrice) external;

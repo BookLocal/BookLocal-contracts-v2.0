@@ -1,42 +1,68 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
-## BookLocalInterface
+# BookLocal Interface
+This describes the BookLocal interface.
+## Events
 ```js
-  event NewHotelCreated(address location);
-  -> picked up by BE server
+  event NewHotelCreated(address hotelAddress);
+  -> for use front end and server use.
 ```
-#### access is restricted to hotel admins
+
+## Functions
+Overview of function names separated by visibility.
+#### External
+External functions are intended to be called outside of the contract they were created in. Ideally, these are reserved for human calls.
 ```js
-  function settle(address _reservationAddr) external;
-  -> called at ViewCurrentGuests or a CheckOut view
-```
-```js
-  function addAdmins(address[] _admins) external;
-  -> called at HotelProfile - ManageEmployees
-```
-#### access is open to all
-```js
-  function newHotel(address[] _owners, uint256 _required) external;
+  function newHotel(address[] _owners, address _wallet) external returns (address hotel);
+  -> open for anyone to set up a new hotel.
   -> called as part of the registration process or from BookLocalAdmin component
   // needs to return something to the front end that will link the address with
   // the rest of the data. Could also accept another parameter and include in
   // the event.
 ```
+
+```js
+  function settle(address _reservationAddr) external;
+  -> ERC809 name for "checkOut"
+  -> restricted to booklocal owner use
+  -> shouldn't need to be used, but left as an option for if we allow for reservation disputes.
+  -> called at ViewCurrentGuests or a CheckOut view
+```
+
+```js
+  function addOwners(address[] _owners) external;
+  -> restricted to owner use.
+  -> adds owners to the BookLocal contract.
+  -> called at HotelProfile - ManageEmployees.
+```
+
+```js
+  function removeOwners(address[] _owners) external;
+  -> restricted to owner use.
+  -> removes owners from BookLocal contract.
+```
+
+```js
+  function geOwners() external returns (address[]);
+  -> restricted to owner use.
+  -> returns all current owners.
+  -> view function so costs zero gas.
+  // note that this may return an array with some zero address values (0x000...000) if owners have been removed.
+  // the zero addresses should be removed from the front end, but it is too costly to do so from the EVM.
+```
+
+#### Public
+Public functions can be called within the contract they were created.
 ```js
   function getHotelCount() external view returns (uint256);
   -> called at NavWrapper, BookLocalAdmin, and 'traveler interface' Search
   // not needed if the hotelEthAddress is returned from the server on login
 ```
 ```js
-  function getHotelAddress(uint256 _hotelId) public returns (address);
+  function getHotelAddress(uint256 _hotelId) public view  returns (address);
   -> called at NavWrapper
 ```
 ```js
   function getWallet() public view returns (address);
   -> called in BookLocalAdmin
-```
-#### need
-```js
-  function getBookLocalAdminArray() public view returns ([adminAddress]);
-  // booklocal admin only
 ```

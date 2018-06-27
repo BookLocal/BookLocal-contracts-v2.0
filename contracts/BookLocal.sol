@@ -1,4 +1,4 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.23;
 
 /*
  *  Author... Steven Lee
@@ -24,9 +24,6 @@ contract BookLocal {
 
     address[] bookLocalOwners;
     mapping (address => bool) isOwner;
-
-    address[] bookLocalAdmins;
-    mapping (address => bool) isAdmin;
 
     // Hotel inventory
     uint256 totalHotels;
@@ -63,11 +60,6 @@ contract BookLocal {
          _;
      }
 
-     modifier senderIsAdmin() {
-         require(isOwner[msg.sender] || isAdmin[msg.sender]);
-         _;
-     }
-
     /**************************************************
      *  External
      */
@@ -80,25 +72,11 @@ contract BookLocal {
     }
 
     function settle(address _reservationAddr)
-        senderIsAdmin
+        senderIsOwner
         external
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.checkOut();
-    }
-
-    function addAdmins(address[] _admins)
-        senderIsOwner
-        external
-    {
-        address _admin;
-        uint numAdmins = _admins.length;
-        for(uint i=0; i<numAdmins; i++) {
-            _admin = _admins[i];
-            require(!isAdmin[_admin] && _admin != address(0));
-            isAdmin[_admin] = true;
-            bookLocalAdmins.push(_admin);
-        }
     }
 
     function addOwners(address[] _owners)
@@ -115,16 +93,6 @@ contract BookLocal {
         }
     }
 
-    function removeAdmins(address[] _admins)
-        senderIsOwner
-        external
-    {
-        uint256 numToRemove = _admins.length;
-        for(uint256 i=0; i<numToRemove; i++) {
-            isAdmin[_admins[i]] = false;
-        }
-    }
-
     function removeOwners(address[] _owners)
         senderIsOwner
         external
@@ -135,25 +103,9 @@ contract BookLocal {
         }
     }
 
-    function getAdmins()
-        external
-        senderIsAdmin
-        view
-        returns (address[])
-    {
-        uint256 numOfAdmins = bookLocalAdmins.length;
-        address[] memory validAdmins = new address[](numOfAdmins);
-        for(uint256 i=0; i<numOfAdmins; i++) {
-            if (isAdmin[bookLocalAdmins[i]]) {
-                validAdmins[i] = bookLocalAdmins[i];
-            }
-        }
-        return validAdmins;
-    }
-
     function getOwners()
         external
-        senderIsAdmin
+        senderIsOwner
         view
         returns (address[])
     {
