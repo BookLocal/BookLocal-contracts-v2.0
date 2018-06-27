@@ -1,27 +1,67 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
-## ReservationInterface
+# Reservation Interface
+## Events
 ```js
   event Deposit(address indexed sender, uint256 value);
   event CheckOut(address indexed guest);
-  -> to BE
+  event Cancel(address indexed guest, address indexed hotel);
 ```
-#### access restricted to only hotel call
-```js
-  function changePrice(uint256 _newPrice) external;
-```
-#### access restricted to only hotel, bookLocal, or guest
+
+## Functions
+
+#### External
+
 ```js
   function checkOut() external;
+  -> restricted to hotel, guest, and booklocal.
+  -> calculates and transfers hotel share, booklocal share, and returns any extra to guest.
+  -> selfdestructs when done.
   -> in 'Hotel Interface' BookLocalAdmin Settle, 'traveler interface' checkOut
 ```
-#### access open to all
+
+```js
+  function cancel() isInContract beforeCheckIn external;
+  -> restricted to hotel, guest, and booklocal.
+  -> calculates a cancelPrice and returns leftover to guest.
+```
+
+```js
+  function canCheckin(address _guest) external view returns (bool);
+  -> checks if _guest can check in right now.  
+```
+
+```js
+ function changePrice(uint256 _newPrice) external;
+ -> restricted to hotel.
+```
+
+```js
+  function changeCancelPrice(uint256 _newPrice) onlyHotel external;
+  -> defaults sets the cancel price at half of the reservation price.
+  -> can change if different. 
+```
+
+#### Public
 ```js
   function getBookLocalWallet() public view returns (address);
 ```
 ```js
   function getHotelWallet() public view returns (address);
 ```
+
+```js
+  function getRoomType() public view returns (address);
+```
+
+```js
+  function getCheckIn() public view returns (address);
+```
+
+```js
+  function getCheckOut() public view returns (address);
+```
+
 ```js
   function getBalance() public view returns (wallet balance);
   -> called in ViewCurrentGuests on DetailsCard
@@ -30,15 +70,7 @@
   function getPrice() public view returns (reservation price);
   -> called in ViewCurrentGuests
 ```
+
 ```js
-  function getRoomType() public view returns (roomTypeAddr)
-  -> called in ViewBookings, DetailsCard?
-```
-```js
-  function getCheckIn() public view returns (checkInDate)
-  -> called in ViewBookings, SingleBookingWindow
-```
-```js
-  function getCheckOut() public view returns (checkOutDate)
-  -> called in ViewBookings, SingleBookingWindow
+  function getCancelPrice() public view returns (uint256);
 ```

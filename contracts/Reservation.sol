@@ -35,6 +35,7 @@ contract Reservation {
     address roomTypeAddr;
     uint256 minRentTime;
     uint256 reservationPrice;
+    uint256 cancelPrice;
     uint256 bookLocalPctShare;
 
     bool hotelHappy;
@@ -73,6 +74,7 @@ contract Reservation {
         reservationPrice = _reservationPrice;
         minRentTime = _minRentTime;
         bookLocalPctShare = 25;
+        _setDefaultCancelPrice();
     }
 
     /**************************************************
@@ -130,7 +132,7 @@ contract Reservation {
     function cancel() isInContract beforeCheckIn external {
 
         // for a cancelled room, charge less
-        uint256 _cancelPrice = _calculateCancelPrice();
+        uint256 _cancelPrice = getCancelPrice();
 
         uint256 _bookLocalShare = _cancelPrice.div(bookLocalPctShare);
         uint256 _hotelShare = _cancelPrice.sub(_bookLocalShare);
@@ -170,6 +172,10 @@ contract Reservation {
         reservationPrice = _newPrice;
     }
 
+    function changeCancelPrice(uint256 _newPrice) onlyHotel external {
+        cancelPrice = _newPrice;
+    }
+
     /**************************************************
      *  Public
      */
@@ -203,10 +209,14 @@ contract Reservation {
         return reservationPrice;
     }
 
+    function getCancelPrice() public view returns (uint256) {
+        return cancelPrice;
+    }
+
     /**************************************************
      *  Internal
      */
-    function _calculateCancelPrice() internal view returns (uint256) {
-        return reservationPrice.div(2);
+    function _setDefaultCancelPrice() internal {
+        cancelPrice = reservationPrice.div(2);
     }
 }
