@@ -1,10 +1,10 @@
 var BookLocal = artifacts.require('./BookLocal.sol');
-var Hotel = artifacts.require('./Hotel.sol');
-var RoomType = artifacts.require('./RoomType.sol');
-var Reservation = artifacts.require('./Reservation.sol');
 
-module.exports = function(deployer,networks,accounts) {
-  deployer.deploy(BookLocal,[accounts[0]],accounts[0]);
+let steve = "0xBAE2175539624c861920C9566486DA79b582D362";
+let bookLocalWallet = "0xd4acca3da200a57b3d4e091b2b0dc6812781bd52";
+
+module.exports = function(deployer,networks) {
+  deployer.deploy(BookLocal,[steve],bookLocalWallet);
 };
 
 // need to deploy MultiDigWallet and Escrow...

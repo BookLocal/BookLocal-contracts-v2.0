@@ -98,25 +98,20 @@ contract BookLocal {
         external
     {
         uint256 numToRemove = _owners.length;
+        address _owner;
         for(uint256 i=0; i<numToRemove; i++) {
-            isOwner[_owners[i]] = false;
+            _owner = _owners[i];
+            isOwner[_owner] = false;
+            _removeOwner(_owner);
         }
     }
 
     function getOwners()
         external
-        senderIsOwner
         view
         returns (address[])
     {
-        uint256 numOfOwners = bookLocalOwners.length;
-        address[] memory validOwners = new address[](numOfOwners);
-        for(uint256 i=0; i<numOfOwners; i++) {
-            if (isOwner[bookLocalOwners[i]]) {
-                validOwners[i] = bookLocalOwners[i];
-            }
-        }
-        return validOwners;
+        return bookLocalOwners;
     }
 
     /**************************************************
@@ -146,5 +141,29 @@ contract BookLocal {
         uint256 hotelId = _incrementHotelCount();
         hotelRegistry[hotelId] = _hotel;
         emit NewHotelCreated(_hotel);
+    }
+
+    function _removeOwner(address _address) internal {
+
+        uint256 _index;
+        uint256 _numOwners = bookLocalOwners.length;
+
+        for (uint i=0; i<_numOwners; i++) {
+            if (_address == bookLocalOwners[i]) {
+                _index = i;
+            }
+        }
+        _removeIndex(_index, bookLocalOwners);
+
+    }
+
+    function _removeIndex(uint256 _index, address[] storage _addrList) internal {
+        require(_index <= _addrList.length-1);
+
+        for (uint i = _index; i<_addrList.length-1; i++){
+            _addrList[i] = _addrList[i+1];
+        }
+        delete _addrList[_addrList.length-1];
+        _addrList.length--;
     }
 }

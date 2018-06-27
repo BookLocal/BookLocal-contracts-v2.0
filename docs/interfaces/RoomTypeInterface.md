@@ -1,6 +1,7 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # RoomType Interface
+Costs 541,229 gas to deploy a new room type.
 
 ## Functions
 
@@ -40,7 +41,7 @@
 
 ```js
   function getRoomTypeInventory() public view returns (uint256);
-  -> returns total inventory. 
+  -> returns total inventory.
 ```
 ```js
   function getMinRentTime() public view returns (uint256);

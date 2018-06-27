@@ -1,3 +1,8 @@
+var HDWalletProvider = require("truffle-hdwallet-provider");
+
+// random generated. First account is 0xa00CDd6d976e4b22D94098dD5e185E12045d03D6
+var mnemonic = "box ketchup large early mutual obscure anxiety guide scheme film fever juice";
+
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
@@ -7,17 +12,15 @@ module.exports = {
       port: 9545,
       network_id: "*" // Match any network id
     },
-    truffleDevelop: { // used 
+    truffleDevelop: { // used
       host: "localhost",
       port: 9545,
       network_id: "*" // Match any network id
     },
     rinkeby: { // need to change the numbers
-      host: "localhost", // Connect to geth on the specified
-      port: 8545,
-      from: "0x0085f8e72391Ce4BB5ce47541C846d059399fA6c", // default address to use for any transaction Truffle makes during migrations
+      provider: function() {return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/ZaVfmcipJtP2PwcV9t8t")},
       network_id: 4,
-      gas: 4612388 // Gas limit used for deploys
+      gas: 7012388 // Gas limit used for deploys
     }
   }
 };

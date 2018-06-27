@@ -139,8 +139,11 @@ contract Hotel {
         external
     {
         uint256 numToRemove = _admins.length;
+        address _admin;
         for(uint256 i=0; i<numToRemove; i++) {
-            isAdmin[_admins[i]] = false;
+            _admin = _admins[i];
+            isAdmin[_admin] = false;
+            _removeAdmin(_admin);
         }
     }
 
@@ -149,8 +152,11 @@ contract Hotel {
         external
     {
         uint256 numToRemove = _owners.length;
+        address _owner;
         for(uint256 i=0; i<numToRemove; i++) {
-            isOwner[_owners[i]] = false;
+            _owner = _owners[i];
+            isOwner[_owner] = false;
+            _removeOwner(_owner);
         }
     }
 
@@ -175,34 +181,18 @@ contract Hotel {
 
     function getAdmins()
         external
-        senderIsAdmin
         view
         returns (address[])
     {
-        uint256 numOfAdmins = hotelAdmins.length;
-        address[] memory validAdmins = new address[](numOfAdmins);
-        for(uint256 i=0; i<numOfAdmins; i++) {
-            if (isAdmin[hotelAdmins[i]]) {
-                validAdmins[i] = hotelAdmins[i];
-            }
-        }
-        return validAdmins;
+        return hotelAdmins;
     }
 
     function getOwners()
         external
-        senderIsAdmin
         view
         returns (address[])
     {
-        uint256 numOfOwners = hotelOwners.length;
-        address[] memory validOwners = new address[](numOfOwners);
-        for(uint256 i=0; i<numOfOwners; i++) {
-            if (isOwner[hotelOwners[i]]) {
-                validOwners[i] = hotelOwners[i];
-            }
-        }
-        return validOwners;
+        return hotelOwners;
     }
 
     /* ERC809 renting */
@@ -443,5 +433,41 @@ contract Hotel {
         uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
         uint256 _pricePerNight = _room.getPrice();
         return _pricePerNight.mul(_lengthOfStay);
+    }
+
+    function _removeOwner(address _address) internal {
+
+        uint256 _index;
+        uint256 _numOwners = hotelOwners.length;
+
+        for (uint i=0; i<_numOwners; i++) {
+            if (_address == hotelOwners[i]) {
+                _index = i;
+            }
+        }
+        _removeIndex(_index, hotelOwners);
+    }
+
+    function _removeAdmin(address _address) internal {
+
+        uint256 _index;
+        uint256 _numAdmins = hotelAdmins.length;
+
+        for (uint i=0; i<_numAdmins; i++) {
+            if (_address == hotelAdmins[i]) {
+                _index = i;
+            }
+        }
+        _removeIndex(_index, hotelAdmins);
+    }
+
+    function _removeIndex(uint256 _index, address[] storage _addrList) internal {
+        require(_index <= _addrList.length-1);
+
+        for (uint i = _index; i<_addrList.length-1; i++){
+            _addrList[i] = _addrList[i+1];
+        }
+        delete _addrList[_addrList.length-1];
+        _addrList.length--;
     }
 }

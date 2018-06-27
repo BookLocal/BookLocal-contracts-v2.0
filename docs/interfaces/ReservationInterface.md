@@ -1,6 +1,8 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # Reservation Interface
+Costs 1,269,968 gas to deploy. 
+
 ## Events
 ```js
   event Deposit(address indexed sender, uint256 value);
@@ -39,7 +41,7 @@
 ```js
   function changeCancelPrice(uint256 _newPrice) onlyHotel external;
   -> defaults sets the cancel price at half of the reservation price.
-  -> can change if different. 
+  -> can change if different.
 ```
 
 #### Public

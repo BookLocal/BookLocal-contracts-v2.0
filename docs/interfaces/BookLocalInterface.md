@@ -1,7 +1,8 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # BookLocal Interface
-This describes the BookLocal interface.
+Deploy costs 5946815 gas to deploy! Need to reduce.
+
 ## Events
 ```js
   event NewHotelCreated(address hotelAddress);
@@ -10,6 +11,7 @@ This describes the BookLocal interface.
 
 ## Functions
 Overview of function names separated by visibility.
+
 #### External
 External functions are intended to be called outside of the contract they were created in. Ideally, these are reserved for human calls.
 ```js
@@ -44,11 +46,7 @@ External functions are intended to be called outside of the contract they were c
 
 ```js
   function getOwners() external returns (address[]);
-  -> restricted to owner use.
   -> returns all current owners.
-  -> view function so costs zero gas.
-  // note that this may return an array with some zero address values (0x000...000) if owners have been removed.
-  // the zero addresses should be removed from the front end, but it is too costly to do so from the EVM.
 ```
 
 #### Public

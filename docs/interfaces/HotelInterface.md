@@ -1,6 +1,7 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # Hotel Interface
+Costs 3,818,344 gas to deploy with two owners. 
 
 ## Events
 These events are intended for front end and server use.
@@ -61,20 +62,12 @@ External functions are designed to be called from other contracts or user accoun
 
 ```js
   function getAdmins() external view returns (address[]);
-  -> restricted to hotel admins.
   -> returns all current administrator addresses
-  -> view function so costs zero gas.
-  // note that this may return an array with some zero address values (0x000...000) if owners have been removed.
-  // the zero addresses should be removed from the front end, but it is too costly to do so from the EVM.
 ```
 
 ```js
   function getOwners() external view returns (address[]);
-  -> restricted to hotel admins.
   -> returns all current owner addresses
-  -> view function so costs zero gas.
-  // note that this may return an array with some zero address values (0x000...000) if owners have been removed.
-  // the zero addresses should be removed from the front end, but it is too costly to do so from the EVM.
 ```
 
 ##### ERC809 renting
