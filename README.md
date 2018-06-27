@@ -1,5 +1,5 @@
 # BookLocal-contracts-v2.0
-This repo contains the core smart contracts for BookLocal v2.0.
+This repo contains the core smart contracts for BookLocal v2.0. For an overview, see interfaces in docs folder. 
 
 ## Quick Test
 In a terminal, change into your favorite working directory, and type:
@@ -20,23 +20,14 @@ It should pass all tests without compiler warning. If warnings appear or a test 
 
 In terminal 2: `truffle compile` then `truffle migrate` to deploy the 'BookLocal' contract.
 
-In terminal 1 (at the `truffle(develop)>` prompt):
+In terminal 1: `truffle dev`, then (at the `truffle(develop)>` prompt):
 ```
 BookLocal.deployed().then(function(res){BL = BookLocal.at(res.address)});
 ```
-This will access the contract. Create a multiSigWallet by:
-```
-
-```
-Then deploy a new hotel:
-```
-BL.newHotel([test address from truffle dev (, or two)], multiSigWallet address);
-```
-This will return the hotel's address.
-
+This will access the contract. For more commands, copy and paste the prompts in file 'commandLineSetUp.js'. 
 
 ## Contents
-For a method overview, see "Interfaces" folder. A general overview of the file structure is as follows:
+For a method overview, see "docs/interfaces" folder. A high-level overview of the file structure is as follows:
 
 ### BookLocal.sol
 Constructs with a list of owners and an address that points to the owners current multisig wallet. BookLocal primary role is to act as a 'hotel factory' and records the deployed address for each new hotel.
