@@ -71,6 +71,10 @@ contract BookLocal {
         _registerHotel(hotel);
     }
 
+    function changeWallet(address _newWallet) senderIsOwner external {
+        bookLocalWallet = _newWallet;
+    }
+
     function settle(address _reservationAddr)
         senderIsOwner
         external

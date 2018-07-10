@@ -106,6 +106,10 @@ contract Hotel {
         _recordRoomType(_roomType);
     }
 
+    function changeWallet(address _newWallet) senderIsOwner external {
+        hotelWallet = _newWallet;
+    }
+
     function addAdmins(address[] _admins)
         senderIsOwner
         external
