@@ -20,6 +20,7 @@ contract Hotel {
     event Reserve(address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
+    event NewHotelWallet(address wallet, address sender);
 
     /**************************************************
      *  Storage
@@ -108,6 +109,7 @@ contract Hotel {
 
     function changeWallet(address _newWallet) senderIsOwner external {
         hotelWallet = _newWallet;
+        emit NewHotelWallet(_newWallet, msg.sender);
     }
 
     function addAdmins(address[] _admins)

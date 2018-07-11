@@ -14,6 +14,7 @@ contract BookLocal {
      *  Events
      */
     event NewHotelCreated(address hotelAddress);
+    event NewBookLocalWallet(address wallet, address sender);
 
     /**************************************************
      *  Storage
@@ -73,6 +74,7 @@ contract BookLocal {
 
     function changeWallet(address _newWallet) senderIsOwner external {
         bookLocalWallet = _newWallet;
+        emit NewBookLocalWallet(_newWallet, msg.sender);
     }
 
     function settle(address _reservationAddr)
