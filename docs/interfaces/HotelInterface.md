@@ -1,7 +1,7 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # Hotel Interface
-Costs 3,818,344 gas to deploy with two owners. 
+Costs 3,818,344 gas to deploy with two owners.
 
 ## Events
 These events are intended for front end and server use.
@@ -26,6 +26,11 @@ External functions are designed to be called from other contracts or user accoun
   function addRoomType(uint256 _price, uint256 _sleeps, uint256 _beds, uint256 _inventory) external;
   -> restricted to hotel owners.
   -> called in RoomTypesMolecule
+```
+
+```js
+  function changeWallet(address _newWallet) senderIsOwner external;
+  -> restricted to hotel owner use
 ```
 
 ```js
@@ -117,7 +122,7 @@ These functions are based on ERC809 - a proposed renting standard for all non-fu
 ```
 
 ```js
-  function getRoomInfo(address _roomTypeAddr) external view returns (uint256 _sleeps, uint256 _beds, uint256 _price, uint256 _minRentTime);
+  function getRoomInfo(address _roomTypeAddr) external view returns (uint256 _sleeps, uint256 _beds, uint256 _price, uint256 _inventory);
   -> get relevant information about a particular roomtype
   -> called in ManageInventoryContainer
 ```

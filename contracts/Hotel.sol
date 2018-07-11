@@ -295,13 +295,13 @@ contract Hotel {
         uint256 _sleeps,
         uint256 _beds,
         uint256 _price,
-        uint256 _minRentTime)
+        uint256 _inventory)
     {
         RoomType _room = RoomType(_roomTypeAddr);
         _sleeps = _room.getNumSleeps();
         _beds = _room.getNumBeds();
         _price = _room.getPrice();
-        _minRentTime = _room.getMinRentTime();
+        _inventory = _room.getRoomTypeInventory();
     }
 
     /**************************************************

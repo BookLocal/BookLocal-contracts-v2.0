@@ -24,6 +24,11 @@ External functions are intended to be called outside of the contract they were c
 ```
 
 ```js
+  function changeWallet(address _newWallet) senderIsOwner external;
+  -> restricted to booklocal owner use
+```
+
+```js
   function settle(address _reservationAddr) external;
   -> ERC809 name for "checkOut"
   -> restricted to booklocal owner use
