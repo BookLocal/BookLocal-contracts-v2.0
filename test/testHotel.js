@@ -9,10 +9,11 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
     let bookLocal;
     let hotelAddress;
     let hotel;
+    let hotelDB_id = 10;
 
     beforeEach('setup Hotel', async function() {
         bookLocal = await BookLocal.new([blWallet],blWallet);
-        await bookLocal.newHotel([hotelWallet], hotelWallet);
+        await bookLocal.newHotel([hotelWallet], hotelWallet, hotelDB_id);
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
         assert.ok(hotel);

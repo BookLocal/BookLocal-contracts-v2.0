@@ -13,7 +13,7 @@ contract BookLocal {
     /**************************************************
      *  Events
      */
-    event NewHotelCreated(address hotelAddress);
+    event NewHotelCreated(address hotelAddress, uint256 databaseId);
     event NewBookLocalWallet(address wallet, address sender);
 
     /**************************************************
@@ -64,12 +64,12 @@ contract BookLocal {
     /**************************************************
      *  External
      */
-    function newHotel(address[] _owners, address _wallet)
+    function newHotel(address[] _owners, address _wallet, uint256 _databaseId)
         external
         returns (address hotel)
     {
         hotel = new Hotel(_owners, _wallet, address(this));
-        _registerHotel(hotel);
+        _registerHotel(hotel, _databaseId);
     }
 
     function changeWallet(address _newWallet) senderIsOwner external {
@@ -143,10 +143,10 @@ contract BookLocal {
         return totalHotels;
     }
 
-    function _registerHotel(address _hotel) internal {
+    function _registerHotel(address _hotel, uint256 _databaseId) internal {
         uint256 hotelId = _incrementHotelCount();
         hotelRegistry[hotelId] = _hotel;
-        emit NewHotelCreated(_hotel);
+        emit NewHotelCreated(_hotel, _databaseId);
     }
 
     function _removeOwner(address _address) internal {

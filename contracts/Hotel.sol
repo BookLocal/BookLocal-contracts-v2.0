@@ -17,10 +17,11 @@ contract Hotel {
     /**************************************************
      *  Events
      */
-    event Reserve(address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
+    event Reserve(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut, uint256 deposit);
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
     event NewHotelWallet(address wallet, address sender);
+    event NewRoomType(address indexed hotel, address indexed roomType);
 
     /**************************************************
      *  Storage
@@ -245,7 +246,7 @@ contract Hotel {
         _reservation.transfer(msg.value);
         _recordReservation(_reservation, _guest, _checkIn);
         _room.addReservation(_reservation, _checkIn, _checkOut);
-        emit Reserve(_reservation, _roomTypeAddr, _checkIn, _checkOut);
+        emit Reserve(_guest, _reservation, _roomTypeAddr, _checkIn, _checkOut, msg.value);
     }
 
     function access(address _reservationAddr, address _potentialGuest)
@@ -409,7 +410,9 @@ contract Hotel {
     }
 
     function _recordRoomType(address _roomType) internal {
+        address _hotel = address(this);
         roomTypes.push(_roomType);
+        emit NewRoomType(_hotel, _roomType);
     }
 
     function _isNotPast(uint256 _reservationTime, RoomType _room)
