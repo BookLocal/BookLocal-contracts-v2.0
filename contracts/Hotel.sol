@@ -21,7 +21,7 @@ contract Hotel {
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
     event NewHotelWallet(address wallet, address sender);
-    event NewRoomType(address indexed hotel, address indexed roomType);
+    event NewRoomType(address indexed hotel, address indexed roomType, string roomCode);
 
     /**************************************************
      *  Storage
@@ -98,14 +98,15 @@ contract Hotel {
         uint256 _price,
         uint256 _sleeps,
         uint256 _beds,
-        uint256 _inventory
+        uint256 _inventory,
+        string _roomCode
     )
         senderIsOwner
         external
     {
         address _hotel = address(this);
         address _roomType = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
-        _recordRoomType(_roomType);
+        _recordRoomType(_roomType, _roomCode);
     }
 
     function changeWallet(address _newWallet) senderIsOwner external {
@@ -409,10 +410,10 @@ contract Hotel {
         reservationsByCheckIn[_checkIn].push(_reservation);
     }
 
-    function _recordRoomType(address _roomType) internal {
+    function _recordRoomType(address _roomType, string _roomCode) internal {
         address _hotel = address(this);
         roomTypes.push(_roomType);
-        emit NewRoomType(_hotel, _roomType);
+        emit NewRoomType(_hotel, _roomType, _roomCode);
     }
 
     function _isNotPast(uint256 _reservationTime, RoomType _room)
