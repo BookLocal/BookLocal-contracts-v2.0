@@ -13,7 +13,7 @@ contract BookLocal {
     /**************************************************
      *  Events
      */
-    event NewHotelCreated(address hotelAddress, uint256 databaseId);
+    event NewHotelCreated(address hotelAddress, string databaseId);
     event NewBookLocalWallet(address wallet, address sender);
 
     /**************************************************
@@ -64,7 +64,7 @@ contract BookLocal {
     /**************************************************
      *  External
      */
-    function newHotel(address[] _owners, address _wallet, uint256 _databaseId)
+    function newHotel(address[] _owners, address _wallet, string _databaseId)
         external
         returns (address hotel)
     {
@@ -143,7 +143,7 @@ contract BookLocal {
         return totalHotels;
     }
 
-    function _registerHotel(address _hotel, uint256 _databaseId) internal {
+    function _registerHotel(address _hotel, string _databaseId) internal {
         uint256 hotelId = _incrementHotelCount();
         hotelRegistry[hotelId] = _hotel;
         emit NewHotelCreated(_hotel, _databaseId);

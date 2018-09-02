@@ -17,7 +17,7 @@ module.exports = {
       port: 9545,
       network_id: "*" // Match any network id
     },
-    rinkeby: { // need to change the numbers
+    rinkeby: { 
       provider: function() {return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/ZaVfmcipJtP2PwcV9t8t")},
       network_id: 4,
       gas: 7012388 // Gas limit used for deploys
