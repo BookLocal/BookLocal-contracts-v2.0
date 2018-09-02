@@ -18,9 +18,9 @@ contract Reservation {
     /**************************************************
      *  Events
      */
-    event Deposit(address indexed sender, uint256 value, address indexed reservation);
-    event CheckOut(address indexed guest, address indexed hotel, address indexed reservation);
-    event Cancel(address indexed guest, address indexed hotel, address indexed reservation);
+    event Deposit(address indexed sender, uint256 value);
+    event CheckOut(uint256 hotelShare);
+    event Cancel(uint256 hotelShare);
 
     /**************************************************
      *  Storage
@@ -46,7 +46,7 @@ contract Reservation {
      */
     function() public payable {
         if (msg.value > 0) {
-            emit Deposit(msg.sender, msg.value, address(this));
+            emit Deposit(msg.sender, msg.value);
         }
     }
 
@@ -123,7 +123,7 @@ contract Reservation {
             guest.transfer(_extra);
         }
 
-        emit CheckOut(guest, hotel, address(this));
+        emit CheckOut(_hotelShare);
 
         // delete contract
         selfdestruct(hotel);
@@ -153,7 +153,7 @@ contract Reservation {
             guest.transfer(_extra);
         }
 
-        emit Cancel(guest, hotel, address(this));
+        emit Cancel(_hotelShare);
 
         // delete contract
         selfdestruct(hotel);
