@@ -19,8 +19,8 @@ contract Reservation {
      *  Events
      */
     event Deposit(address indexed sender, uint256 value, address indexed reservation);
-    event CheckOut(address indexed guest, address indexed hotel);
-    event Cancel(address indexed guest, address indexed hotel);
+    event CheckOut(address indexed guest, address indexed hotel, address indexed reservation);
+    event Cancel(address indexed guest, address indexed hotel, address indexed reservation);
 
     /**************************************************
      *  Storage
@@ -123,7 +123,7 @@ contract Reservation {
             guest.transfer(_extra);
         }
 
-        emit CheckOut(guest, hotel);
+        emit CheckOut(guest, hotel, address(this));
 
         // delete contract
         selfdestruct(hotel);
@@ -153,7 +153,7 @@ contract Reservation {
             guest.transfer(_extra);
         }
 
-        emit Cancel(guest, hotel);
+        emit Cancel(guest, hotel, address(this));
 
         // delete contract
         selfdestruct(hotel);
