@@ -8,6 +8,7 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
     let bookLocal;
     let hotelAddress;
     let hotel;
+    let roomTypeAddr;
     let reservationAddr;
     let reservation;
     let checkIn;
@@ -35,12 +36,13 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
         await hotel.addRoomType(price, sleeps, beds, inventory, roomDB_id, {from:hotelWallet});
 
         // set checkIn for tomorrow
-        checkIn = await hotel.getCurrentAdjustedTime(roomTypeId);
+        roomTypeAddr = await hotel.getRoomTypeAddress(0);
+        checkIn = await hotel.getCurrentAdjustedTime(roomTypeAddr);
         checkIn = checkIn.toNumber() + 1;
         checkOut = checkIn + 2;
 
         // make reservation and get it's info
-        await hotel.reserve(roomTypeId, checkIn, checkOut, {from:guestWallet, value:200});
+        await hotel.reserve(roomTypeAddr, checkIn, checkOut, {from:guestWallet, value:200});
         const reservations = await hotel.getReservationByCheckInDay(checkIn);
         reservationAddr = reservations[0];
         reservation = await Reservation.at(reservationAddr);
@@ -58,7 +60,6 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
 
     it('should update availability after a guest cancels', async() => {
         await reservation.cancel({from:guestWallet});
-        const roomTypeAddr = await hotel.getRoomTypeAddress(roomTypeId);
         const roomType = await RoomType.at(roomTypeAddr);
 
         const available = await roomType.getAvailability(checkIn);

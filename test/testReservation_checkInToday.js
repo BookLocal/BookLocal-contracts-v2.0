@@ -8,11 +8,11 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     let bookLocal;
     let hotelAddress;
     let hotel;
+    let roomTypeAddr;
     let reservationAddr;
     let reservation;
     let checkIn;
     let checkOut;
-    let roomTypeId = 0;
     let hotelDB_id = 10;
     let roomDB_id = 10;
 
@@ -35,11 +35,12 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
         await hotel.addRoomType(price, sleeps, beds, inventory, roomDB_id, {from:hotelWallet});
 
         // set checkIn and checkOut info
-        checkIn = await hotel.getCurrentAdjustedTime(roomTypeId);
+        roomTypeAddr = await hotel.getRoomTypeAddress(0);
+        checkIn = await hotel.getCurrentAdjustedTime(roomTypeAddr);
         checkOut = checkIn.toNumber() + 2;
 
         // make reservation and get it's info
-        await hotel.reserve(roomTypeId, checkIn.toNumber(), checkOut, {from:guestWallet, value:200});
+        await hotel.reserve(roomTypeAddr, checkIn.toNumber(), checkOut, {from:guestWallet, value:200});
         const reservations = await hotel.getReservationByCheckInDay(checkIn.toNumber());
         reservationAddr = reservations[0];
         reservation = await Reservation.at(reservationAddr);
@@ -48,7 +49,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
     it("should fail if you don't send enough money", async() => {
         try {
-            await hotel.reserve(0, checkIn.toNumber(), checkOut, {from:guestWallet, value:100});
+            await hotel.reserve(roomTypeAddr, checkIn.toNumber(), checkOut, {from:guestWallet, value:100});
             assert.fail('expected revert');
         } catch (error) {
             const revertFound = error.message.search('revert') >= 0;
@@ -97,7 +98,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     })
 
     it('should update availability after a reservation is made', async() => {
-        const availability = await hotel.getAvailability(roomTypeId, checkIn.toNumber());
+        const availability = await hotel.getAvailability(roomTypeAddr, checkIn.toNumber());
         assert.equal(availability, 9);
     })
 
