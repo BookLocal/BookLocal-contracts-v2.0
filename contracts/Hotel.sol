@@ -105,8 +105,8 @@ contract Hotel {
         external
     {
         address _hotel = address(this);
-        address _roomType = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
-        _recordRoomType(_roomType, _roomCode);
+        address _roomTypeAddr = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
+        _recordRoomType(_roomTypeAddr, _roomCode);
     }
 
     function changeWallet(address _newWallet) senderIsOwner external {
@@ -205,14 +205,13 @@ contract Hotel {
 
     /* ERC809 renting */
     function reserve(
-        uint256 _roomType,
+        address _roomTypeAddr,
         uint256 _checkIn,
         uint256 _checkOut
     )
         external
         payable
     {
-        address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
 
         // make sure renter sends enough money
@@ -222,7 +221,7 @@ contract Hotel {
 
         // make sure there is availability
         // and that check in is in the future
-        require(hasAvailability(_roomType, _checkIn, _checkOut));
+        require(hasAvailability(_roomTypeAddr, _checkIn, _checkOut));
         require(_isNotPast(_checkIn, _room));
 
         address _bookLocal = bookLocal;
@@ -323,12 +322,11 @@ contract Hotel {
         return roomTypes[_type];
     }
 
-    function getAvailability(uint256 _roomType, uint256 _day)
+    function getAvailability(address _roomTypeAddr, uint256 _day)
         public
         view
         returns (uint256)
     {
-        address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
         return _room.getAvailability(_day);
     }
@@ -349,7 +347,7 @@ contract Hotel {
     }
 
     function hasAvailability(
-        uint256 _roomType,
+        address _roomTypeAddr,
         uint256 _checkIn,
         uint256 _checkOut
     )
@@ -357,7 +355,6 @@ contract Hotel {
         view
         returns (bool)
     {
-        address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
 
         for (uint i=_checkIn; i<_checkOut; i++) {
@@ -370,19 +367,18 @@ contract Hotel {
         return true;
     }
 
-    function getCurrentAdjustedTime(uint256 _roomType)
+    function getCurrentAdjustedTime(address _roomTypeAddr)
         public
         view
         returns (uint256)
     {
-        address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
         uint256 _minRentTime = _room.getMinRentTime();
         return now.div(_minRentTime);
     }
 
     function getReservationPrice(
-        uint256 _roomType,
+        address _roomTypeAddr,
         uint256 _checkIn,
         uint256 _checkOut
     )
@@ -390,7 +386,6 @@ contract Hotel {
         view
         returns (uint256 _price)
     {
-        address _roomTypeAddr = roomTypes[_roomType];
         RoomType _room = RoomType(_roomTypeAddr);
 
         _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
@@ -410,10 +405,10 @@ contract Hotel {
         reservationsByCheckIn[_checkIn].push(_reservation);
     }
 
-    function _recordRoomType(address _roomType, string _roomCode) internal {
+    function _recordRoomType(address _roomTypeAddr, string _roomCode) internal {
         address _hotel = address(this);
-        roomTypes.push(_roomType);
-        emit NewRoomType(_hotel, _roomType, _roomCode);
+        roomTypes.push(_roomTypeAddr);
+        emit NewRoomType(_hotel, _roomTypeAddr, _roomCode);
     }
 
     function _isNotPast(uint256 _reservationTime, RoomType _room)
