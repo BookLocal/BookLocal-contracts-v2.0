@@ -1,7 +1,6 @@
 [//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
 
 # Reservation Interface
-Costs 1,269,968 gas to deploy. 
 
 ## Events
 ```js
@@ -13,7 +12,6 @@ event Cancel(address indexed guest, address indexed hotel);
 ## Functions
 
 #### External
-
 ```js
 function checkOut() external;
 function cancel() isInContract beforeCheckIn external;

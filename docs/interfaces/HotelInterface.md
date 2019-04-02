@@ -1,7 +1,6 @@
 # Hotel Interface
 
 ## Events
-These events are intended for front end and server use.
 ```js
 event Reserve(address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
 event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
@@ -11,7 +10,6 @@ event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
 ## Functions
 
 #### External
-
 ```js
 function addRoomType(uint256 _price, uint256 _sleeps, uint256 _beds, uint256 _inventory) external;
 function changeWallet(address _newWallet) senderIsOwner external;
