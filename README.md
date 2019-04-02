@@ -24,7 +24,7 @@ In terminal 1: `truffle dev`, then (at the `truffle(develop)>` prompt):
 ```
 BookLocal.deployed().then(function(res){BL = BookLocal.at(res.address)});
 ```
-This will access the contract. For more commands, copy and paste the prompts in file 'commandLineSetUp.js'. 
+This will canAccess the contract. For more commands, copy and paste the prompts in file 'commandLineSetUp.js'. 
 
 ## Contents
 For a method overview, see "docs/interfaces" folder. A high-level overview of the file structure is as follows:
@@ -43,4 +43,4 @@ Simple storage contract that can group similar rooms into a single unit. The exa
 - total availability
 
 ### Reservation.sol
-Simple escrow account between BookLocal, the hotel, and the guest. Commission details subjects to change. Only the hotel can change the final price. Any party in the contract can cancel or checkout of the room. For now, disputes should be settled in person between the hotel and guest with a price adjustement before checkout.
+Simple escrow account between BookLocal, the hotel, and the guest. Commission details subjects to change. Only the hotel can change the final price. Any party in the contract can cancel or checkout of the room. For now, disputes should be closeReservationd in person between the hotel and guest with a price adjustement before checkout.

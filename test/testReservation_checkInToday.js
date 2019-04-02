@@ -101,7 +101,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     })
 
     it('should let the guest checkIn ', async() => {
-        const canCheckIn = await hotel.access(reservationAddr, guestWallet);
+        const canCheckIn = await hotel.canAccess(reservationAddr, guestWallet);
         assert.equal(canCheckIn, true);
     })
 
@@ -120,16 +120,16 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     })
 
     it('should let hotel checkout', async() => {
-        assert(await hotel.settle(reservationAddr,{from:hotelWallet}));
+        assert(await hotel.closeReservation(reservationAddr,{from:hotelWallet}));
     })
 
     it('should let bookLocal checkout', async() => {
-        assert(await bookLocal.settle(reservationAddr,{from:blWallet}));
+        assert(await bookLocal.closeReservation(reservationAddr,{from:blWallet}));
     })
 
-    it('should not let the guest cancel the day of checkIn', async() => {
+    it('should not let the guest cancelReservation the day of checkIn', async() => {
         try {
-            await await reservation.cancel({from: guestWallet});
+            await await reservation.cancelReservation({from: guestWallet});
             assert.fail('Expected revert not received');
         } catch (error) {
             const revertFound = error.message.search('revert') >= 0;

@@ -11,7 +11,9 @@ contract Hotel {
     /**************************************************
      *  Events
      */
-    event Reserve(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut, uint256 deposit);
+     
+    event Reserve(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
+    event Cancel(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
     event NewHotelWallet(address wallet, address sender);
@@ -44,6 +46,7 @@ contract Hotel {
     /**************************************************
      *  Constructor
      */
+
     constructor(
         address[] memory _owners,
         address _wallet,
@@ -66,6 +69,7 @@ contract Hotel {
     /**************************************************
      *  Fallback
      */
+
     function() public payable {
         revert();
     }
@@ -73,6 +77,7 @@ contract Hotel {
     /**************************************************
      *  Modifiers
      */
+
     modifier senderIsOwner() {
         require(isOwner[msg.sender]);
         _;
@@ -88,6 +93,7 @@ contract Hotel {
      */
 
     /* owner only */
+
     function addRoomType(
         uint256 _price,
         uint256 _sleeps,
@@ -142,6 +148,7 @@ contract Hotel {
     }
 
     /* admin only */
+
     function changeReservationPrice(address _reservationAddr, uint256 _newPrice)
         senderIsAdmin
         external
@@ -177,6 +184,7 @@ contract Hotel {
     }
 
     /* ERC809 renting */
+
     function reserve(
         address _roomTypeAddr,
         uint256 _checkIn,
@@ -219,10 +227,10 @@ contract Hotel {
         _reservation.transfer(msg.value);
         _recordReservation(_reservation, _guest, _checkIn);
         _room.addReservation(_reservation, _checkIn, _checkOut);
-        emit Reserve(_guest, _reservation, _roomTypeAddr, _checkIn, _checkOut, msg.value);
+        emit Reserve(_guest, _reservation, _roomTypeAddr, _checkIn, _checkOut);
     }
 
-    function access(address _reservationAddr, address _potentialGuest)
+    function canAccess(address _reservationAddr, address _potentialGuest)
         external
         view
         returns (bool)
@@ -231,7 +239,7 @@ contract Hotel {
         return _reservation.canCheckIn(_potentialGuest);
     }
 
-    function settle(address _reservationAddr)
+    function closeReservation(address _reservationAddr)
         senderIsAdmin
         external
     {
@@ -239,12 +247,12 @@ contract Hotel {
         _reservation.checkOut();
     }
 
-    function cancel(address _reservationAddr)
+    function cancelReservation(address _reservationAddr)
         senderIsAdmin
         external
     {
         Reservation _reservation = Reservation(_reservationAddr);
-        _reservation.cancel();
+        _reservation.cancelReservation();
     }
 
     function getReservationByCheckInDay(uint256 _day)
@@ -283,6 +291,7 @@ contract Hotel {
     /**************************************************
      *  Public
      */
+
     function getWallet() public view returns (address) {
         return hotelWallet;
     }
@@ -303,22 +312,7 @@ contract Hotel {
         RoomType _room = RoomType(_roomTypeAddr);
         return _room.getAvailability(_day);
     }
-
-    function getTotalRooms() public view returns (uint256) {
-        uint256 _totalRoomTypes = getNumOfRoomTypes();
-        uint256 _totalRooms;
-        address _roomTypeAddr;
-        RoomType _room;
-
-        for (uint256 i=0; i<_totalRoomTypes; i++) {
-            _roomTypeAddr = roomTypes[i];
-            _room = RoomType(_roomTypeAddr);
-
-            _totalRooms += _room.getRoomTypeInventory();
-        }
-        return _totalRooms;
-    }
-
+ 
     function hasAvailability(
         address _roomTypeAddr,
         uint256 _checkIn,
@@ -338,6 +332,21 @@ contract Hotel {
             }
         }
         return true;
+    }
+
+    function getTotalRooms() public view returns (uint256) {
+        uint256 _totalRoomTypes = getNumOfRoomTypes();
+        uint256 _totalRooms;
+        address _roomTypeAddr;
+        RoomType _room;
+
+        for (uint256 i=0; i<_totalRoomTypes; i++) {
+            _roomTypeAddr = roomTypes[i];
+            _room = RoomType(_roomTypeAddr);
+
+            _totalRooms += _room.getRoomTypeInventory();
+        }
+        return _totalRooms;
     }
 
     function getCurrentAdjustedTime(address _roomTypeAddr)
@@ -360,7 +369,6 @@ contract Hotel {
         returns (uint256 _price)
     {
         RoomType _room = RoomType(_roomTypeAddr);
-
         _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
     }
 

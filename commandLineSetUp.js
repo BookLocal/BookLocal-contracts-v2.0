@@ -77,7 +77,7 @@ module.exports = async function(callback) {
   hotel.access.call(reservationAddrs[0],guest).then(function(res) {console.log(res)});
 
   // hotel checks out the guest
-  hotel.settle(reservationAddrs[0], {from:hotelOwner});
+  hotel.closeReservation(reservationAddrs[0], {from:hotelOwner});
 
   /*
   // Alternatively, the guest could check out like so:

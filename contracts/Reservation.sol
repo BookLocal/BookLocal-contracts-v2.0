@@ -12,32 +12,31 @@ contract Reservation {
     /**************************************************
      *  Events
      */
+
     event Deposit(address indexed sender, uint256 value);
     event CheckOut(uint256 hotelShare);
-    event Cancel(uint256 hotelShare);
 
     /**************************************************
      *  Storage
      */
+
     address bookLocal;
     address hotel;
     address guest;
 
-    uint256 checkInDate;
-    uint256 checkOutDate;
+    uint256 public checkInDate;
+    uint256 public checkOutDate;
+    address public roomTypeAddr;
 
-    address roomTypeAddr;
     uint256 minRentTime;
     uint256 reservationPrice;
     uint256 cancelPrice;
     uint256 bookLocalPctShare;
 
-    bool hotelHappy;
-    bool guestHappy;
-
     /**************************************************
      *  Fallback
      */
+
     function() public payable {
         if (msg.value > 0) {
             emit Deposit(msg.sender, msg.value);
@@ -47,6 +46,7 @@ contract Reservation {
     /**************************************************
      *  Constructor
      */
+
     constructor(
         address _roomTypeAddr,
         address _bookLocal,
@@ -64,16 +64,17 @@ contract Reservation {
         hotel = _hotel;
         guest = _guest;
         checkInDate = _checkIn;
-        checkOutDate = _checkOut;
+        checkOutDate = _checkOut; 
         reservationPrice = _reservationPrice;
         minRentTime = _minRentTime;
-        bookLocalPctShare = 25;
+        bookLocalPctShare = 25;    // 1/25 th of reservation price
         _setDefaultCancelPrice();
     }
 
     /**************************************************
      *  Modifiers
      */
+
     modifier onlyHotel() {
         require(msg.sender == hotel);
         _;
@@ -99,6 +100,7 @@ contract Reservation {
     /**************************************************
      *  External
      */
+
     function checkOut() isInContract afterCheckIn external {
 
         uint256 _bookLocalShare = reservationPrice.div(bookLocalPctShare);
@@ -123,7 +125,7 @@ contract Reservation {
         selfdestruct(hotel);
     }
 
-    function cancel() isInContract beforeCheckIn external {
+    function cancelReservation() isInContract beforeCheckIn external {
 
         // for a cancelled room, charge less
         uint256 _cancelPrice = getCancelPrice();
@@ -146,8 +148,6 @@ contract Reservation {
         if (_extra > 0) {
             guest.transfer(_extra);
         }
-
-        emit Cancel(_hotelShare);
 
         // delete contract
         selfdestruct(hotel);
@@ -173,6 +173,7 @@ contract Reservation {
     /**************************************************
      *  Public
      */
+
     function getBookLocalWallet() public view returns (address) {
         BookLocal _bookLocal = BookLocal(bookLocal);
         return _bookLocal.getWallet();
@@ -181,18 +182,6 @@ contract Reservation {
     function getHotelWallet() public view returns (address) {
         Hotel _hotel = Hotel(hotel);
         return _hotel.getWallet();
-    }
-
-    function getRoomType() public view returns (address) {
-        return roomTypeAddr;
-    }
-
-    function getCheckIn() public view returns (uint256) {
-        return checkInDate;
-    }
-
-    function getCheckOut() public view returns (uint256) {
-        return checkOutDate;
     }
 
     function getBalance() public view returns (uint256) {

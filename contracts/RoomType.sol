@@ -11,16 +11,16 @@ contract RoomType {
      */
 
     // hotel ownership information
-    address hotel;
+    address public hotel;
 
     // room information
-    uint256 price;
-    uint256 sleeps;
-    uint256 beds;
-    uint256 minRentTime = 3600*24;           // minimum time in seconds
+    uint256 public price;
+    uint256 public sleeps;
+    uint256 public beds;
+    uint256 public minRentTime = 3600*24;           // minimum time in seconds
 
     // availability information
-    uint256 inventory;
+    uint256 public inventory;
     mapping (uint256 => uint256) checkIns;   // date => numCheckIns
     mapping (uint256 => uint256) checkOuts;  // date => numCheckOuts
     mapping (uint256 => uint256) occupied;   // date => numOccupied
@@ -31,6 +31,7 @@ contract RoomType {
     /**************************************************
      *  Constructor
      */
+
     constructor(
         address _hotel,
         uint256 _price,
@@ -50,6 +51,7 @@ contract RoomType {
     /**************************************************
      *  Modifiers
      */
+
     modifier onlyHotel() {
         require(msg.sender == hotel);
         _;
@@ -63,8 +65,9 @@ contract RoomType {
     /**************************************************
      *  External
      *
-     *  (all protected for hotel use only)
+     *  (protected for hotel use only)
      */
+
     function changePrice(uint256 _newPrice)
         onlyHotel
         external
@@ -107,6 +110,7 @@ contract RoomType {
     /**************************************************
      *  Public
      */
+
     function getDailyInfo(uint256 _day)
         public
         view

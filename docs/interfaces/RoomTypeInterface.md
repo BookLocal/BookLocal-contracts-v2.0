@@ -1,4 +1,4 @@
-[//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
+# RoomType Interface
 
 ## Functions
 

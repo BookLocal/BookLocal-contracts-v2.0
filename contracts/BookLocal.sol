@@ -8,7 +8,7 @@ contract BookLocal {
      *  Events
      */
     event NewHotelCreated(address hotelAddress);
-    event NewBookLocalWallet(address wallet, address sender);
+    event NewBookLocalWallet(address wallet);
 
     /**************************************************
      *  Storage
@@ -22,7 +22,7 @@ contract BookLocal {
 
     // Hotel inventory
     uint256 totalHotels;
-    mapping (uint256 => address) hotelRegistry;
+    mapping (uint256 => address) public hotelRegistry;
 
     /**************************************************
      *  Constructor
@@ -68,10 +68,10 @@ contract BookLocal {
 
     function changeWallet(address _newWallet) senderIsOwner external {
         bookLocalWallet = _newWallet;
-        emit NewBookLocalWallet(_newWallet, msg.sender);
+        emit NewBookLocalWallet(_newWallet);
     }
 
-    function settle(address _reservationAddr)
+    function closeReservation(address _reservationAddr)
         senderIsOwner
         external
     {

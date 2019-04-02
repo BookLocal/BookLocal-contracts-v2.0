@@ -1,22 +1,19 @@
-[//]: <> ( in Atom hit ctrl + shift + m for markdown preview )
-
 # Reservation Interface
 
 ## Events
 ```js
 event Deposit(address indexed sender, uint256 value);
 event CheckOut(address indexed guest);
-event Cancel(address indexed guest, address indexed hotel);
 ```
 
 ## Functions
 
 #### External
 ```js
-function checkOut() external;
-function cancel() isInContract beforeCheckIn external;
+function checkOut() isInContract afterCheckIn external;
+function cancelReservation() isInContract beforeCheckIn external;
 function canCheckin(address _guest) external view returns (bool);
-function changePrice(uint256 _newPrice) external;
+function changePrice(uint256 _newPrice) onlyHotel external;
 function changeCancelPrice(uint256 _newPrice) onlyHotel external;
 ```
 

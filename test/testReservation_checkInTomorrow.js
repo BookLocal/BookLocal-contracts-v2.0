@@ -48,16 +48,16 @@ contract('Reservation with future checkIn date', function([blWallet,hotelWallet,
     })
 
     it('should not let the guest checkIn early', async() => {
-        const canCheckIn = await hotel.access(reservationAddr, guestWallet);
+        const canCheckIn = await hotel.canAccess(reservationAddr, guestWallet);
         assert.equal(canCheckIn, false);
     })
 
     it('should let the guest cancel before checkIn', async() => {
-        assert(await reservation.cancel({from:guestWallet}));
+        assert(await reservation.cancelReservation({from:guestWallet}));
     })
 
     it('should update availability after a guest cancels', async() => {
-        await reservation.cancel({from:guestWallet});
+        await reservation.cancelReservation({from:guestWallet});
         const roomType = await RoomType.at(roomTypeAddr);
 
         const available = await roomType.getAvailability(checkIn);
