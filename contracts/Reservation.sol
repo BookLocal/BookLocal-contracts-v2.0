@@ -1,11 +1,5 @@
 pragma solidity ^0.4.23;
 
-/*
- *  Author... Steven Lee
- *  Email.... steven@booklocal.in
- *  Date..... 5.30.18
- */
-
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './BookLocal.sol';
 import './Hotel.sol';

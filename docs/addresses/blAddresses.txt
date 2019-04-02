@@ -1,2 +1,0 @@
-// BookLocal Address on Rinkeby
-0x953a027fc2a3cd3af34dec778f3c04de524b5d5b
