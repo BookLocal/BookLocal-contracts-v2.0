@@ -3,6 +3,7 @@
 ## Events
 ```js
 event Deposit(address indexed sender, uint256 value);
+event Cancel(address indexed guest, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
 event CheckOut(address indexed guest);
 ```
 

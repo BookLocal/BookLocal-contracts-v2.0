@@ -13,7 +13,6 @@ contract Hotel {
      */
      
     event Reserve(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
-    event Cancel(address indexed sender, address indexed reservation, address roomTypeAddr, uint256 checkIn, uint256 checkOut);
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
     event NewHotelWallet(address wallet, address sender);
