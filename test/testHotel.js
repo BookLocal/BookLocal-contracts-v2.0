@@ -9,12 +9,11 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
     let bookLocal;
     let hotelAddress;
     let hotel;
-    let hotelDB_id = 10;
     let roomCode = 10;
 
     beforeEach('setup Hotel', async function() {
         bookLocal = await BookLocal.new([blWallet],blWallet);
-        await bookLocal.newHotel([hotelWallet], hotelWallet, hotelDB_id);
+        await bookLocal.newHotel([hotelWallet], hotelWallet);
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
         assert.ok(hotel);
@@ -26,7 +25,7 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
     })
 
     it('should only let hotel owner create inventory', async () => {
-        await hotel.addRoomType(100,2,1,10,roomCode,{from:hotelWallet});
+        await hotel.addRoomType(100,2,1,10,{from:hotelWallet});
         const roomTypeCount = await hotel.getNumOfRoomTypes();
         const roomCount = await hotel.getTotalRooms();
         assert.equal(roomTypeCount, 1);
@@ -35,7 +34,7 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
 
     it('should not let bookLocal (or anyone else) create inventory', async() => {
         try {
-            await hotel.addRoomType(100,2,1,10,roomCode,{from:blWallet});
+            await hotel.addRoomType(100,2,1,10,{from:blWallet});
             assert.fail('Expected revert');
         } catch (error) {
             const revertFound = error.message.search('revert') >= 0;

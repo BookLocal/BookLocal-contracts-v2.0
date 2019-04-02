@@ -21,7 +21,7 @@ contract Hotel {
     event ChangeRoomPrice(address indexed roomType, uint256 newPrice);
     event ChangeReservationPrice(address indexed reservation, uint256 newPrice);
     event NewHotelWallet(address wallet, address sender);
-    event NewRoomType(address indexed hotel, address indexed roomType, string roomCode);
+    event NewRoomType(address indexed hotel, address indexed roomType);
 
     /**************************************************
      *  Storage
@@ -51,7 +51,7 @@ contract Hotel {
      *  Constructor
      */
     constructor(
-        address[] _owners,
+        address[] memory _owners,
         address _wallet,
         address _bookLocal
     )
@@ -98,15 +98,14 @@ contract Hotel {
         uint256 _price,
         uint256 _sleeps,
         uint256 _beds,
-        uint256 _inventory,
-        string _roomCode
+        uint256 _inventory
     )
         senderIsOwner
         external
     {
         address _hotel = address(this);
         address _roomTypeAddr = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
-        _recordRoomType(_roomTypeAddr, _roomCode);
+        _recordRoomType(_roomTypeAddr);
     }
 
     function changeWallet(address _newWallet) senderIsOwner external {
@@ -114,58 +113,38 @@ contract Hotel {
         emit NewHotelWallet(_newWallet, msg.sender);
     }
 
-    function addAdmins(address[] _admins)
+    function addAdmin(address _admin)
         senderIsOwner
         external
     {
-        address _admin;
-        uint numOwners = _admins.length;
-        for(uint i=0; i<numOwners; i++) {
-            _admin = _admins[i];
-            require(!isAdmin[_admin] && _admin != address(0));
-            isAdmin[_admin] = true;
-            hotelAdmins.push(_admin);
-        }
+        require(!isAdmin[_admin] && _admin != address(0));
+        isAdmin[_admin] = true;
+        hotelAdmins.push(_admin);
     }
 
-    function addOwners(address[] _owners)
+    function addOwner(address _owner)
         senderIsOwner
         external
     {
-        address _owner;
-        uint numOwners = _owners.length;
-        for(uint i=0; i<numOwners; i++) {
-            _owner = _owners[i];
-            require(!isOwner[_owner] && _owner != address(0));
-            isOwner[_owner] = true;
-            hotelOwners.push(_owner);
-        }
+        require(!isOwner[_owner] && _owner != address(0));
+        isOwner[_owner] = true;
+        hotelOwners.push(_owner);
     }
 
-    function removeAdmins(address[] _admins)
+    function removeAdmin(address _admin)
         senderIsOwner
         external
     {
-        uint256 numToRemove = _admins.length;
-        address _admin;
-        for(uint256 i=0; i<numToRemove; i++) {
-            _admin = _admins[i];
-            isAdmin[_admin] = false;
-            _removeAdmin(_admin);
-        }
+        isAdmin[_admin] = false;
+        _removeAdmin(_admin);
     }
 
-    function removeOwners(address[] _owners)
+    function removeOwner(address _owner)
         senderIsOwner
         external
     {
-        uint256 numToRemove = _owners.length;
-        address _owner;
-        for(uint256 i=0; i<numToRemove; i++) {
-            _owner = _owners[i];
-            isOwner[_owner] = false;
-            _removeOwner(_owner);
-        }
+        isOwner[_owner] = false;
+        _removeOwner(_owner);
     }
 
     /* admin only */
@@ -190,7 +169,7 @@ contract Hotel {
     function getAdmins()
         external
         view
-        returns (address[])
+        returns (address[] memory)
     {
         return hotelAdmins;
     }
@@ -198,7 +177,7 @@ contract Hotel {
     function getOwners()
         external
         view
-        returns (address[])
+        returns (address[] memory)
     {
         return hotelOwners;
     }
@@ -277,7 +256,7 @@ contract Hotel {
     function getReservationByCheckInDay(uint256 _day)
         external
         view
-        returns (address[])
+        returns (address[] memory)
     {
         return reservationsByCheckIn[_day];
     }
@@ -285,7 +264,7 @@ contract Hotel {
     function getReservationByGuestAddr(address _guest)
         external
         view
-        returns (address[])
+        returns (address[] memory)
     {
         return reservationsByGuest[_guest];
     }
@@ -405,10 +384,10 @@ contract Hotel {
         reservationsByCheckIn[_checkIn].push(_reservation);
     }
 
-    function _recordRoomType(address _roomTypeAddr, string _roomCode) internal {
+    function _recordRoomType(address _roomTypeAddr) internal {
         address _hotel = address(this);
         roomTypes.push(_roomTypeAddr);
-        emit NewRoomType(_hotel, _roomTypeAddr, _roomCode);
+        emit NewRoomType(_hotel, _roomTypeAddr);
     }
 
     function _isNotPast(uint256 _reservationTime, RoomType _room)

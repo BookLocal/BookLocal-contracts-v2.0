@@ -1,11 +1,5 @@
 pragma solidity ^0.4.23;
 
-/*
- *  Author... Steven Lee
- *  Email.... steven@booklocal.in
- *  Date..... 5.30.18
- */
-
 import './Hotel.sol';
 
 contract BookLocal {
@@ -13,7 +7,7 @@ contract BookLocal {
     /**************************************************
      *  Events
      */
-    event NewHotelCreated(address hotelAddress, string databaseId);
+    event NewHotelCreated(address hotelAddress);
     event NewBookLocalWallet(address wallet, address sender);
 
     /**************************************************
@@ -33,7 +27,7 @@ contract BookLocal {
     /**************************************************
      *  Constructor
      */
-    constructor(address[] _owners, address _wallet) public {
+    constructor(address[] memory _owners, address _wallet) public {
 
         uint256 numOwners = _owners.length;
 
@@ -49,7 +43,7 @@ contract BookLocal {
     /**************************************************
      *  Fallback
      */
-    function() public payable {
+    function() external payable {
         revert();
     }
 
@@ -64,12 +58,12 @@ contract BookLocal {
     /**************************************************
      *  External
      */
-    function newHotel(address[] _owners, address _wallet, string _databaseId)
+    function newHotel(address[] _owners, address _wallet)
         external
         returns (address hotel)
     {
         hotel = new Hotel(_owners, _wallet, address(this));
-        _registerHotel(hotel, _databaseId);
+        _registerHotel(hotel);
     }
 
     function changeWallet(address _newWallet) senderIsOwner external {
@@ -85,37 +79,27 @@ contract BookLocal {
         _reservation.checkOut();
     }
 
-    function addOwners(address[] _owners)
+    function addOwner(address _owner)
         senderIsOwner
         external
-    {
-        address _owner;
-        uint numOwners = _owners.length;
-        for(uint i=0; i<numOwners; i++) {
-            _owner = _owners[i];
-            require(!isOwner[_owner] && _owner != address(0));
-            isOwner[_owner] = true;
-            bookLocalOwners.push(_owner);
-        }
+{
+        require(!isOwner[_owner] && _owner != address(0));
+        isOwner[_owner] = true;
+        bookLocalOwners.push(_owner);
     }
 
-    function removeOwners(address[] _owners)
+    function removeOwner(address _owner)
         senderIsOwner
         external
-    {
-        uint256 numToRemove = _owners.length;
-        address _owner;
-        for(uint256 i=0; i<numToRemove; i++) {
-            _owner = _owners[i];
-            isOwner[_owner] = false;
-            _removeOwner(_owner);
-        }
+{
+        isOwner[_owner] = false;
+        _removeOwner(_owner);
     }
 
     function getOwners()
         external
         view
-        returns (address[])
+        returns (address[] memory)
     {
         return bookLocalOwners;
     }
@@ -143,10 +127,10 @@ contract BookLocal {
         return totalHotels;
     }
 
-    function _registerHotel(address _hotel, string _databaseId) internal {
+    function _registerHotel(address _hotel) internal {
         uint256 hotelId = _incrementHotelCount();
         hotelRegistry[hotelId] = _hotel;
-        emit NewHotelCreated(_hotel, _databaseId);
+        emit NewHotelCreated(_hotel);
     }
 
     function _removeOwner(address _address) internal {

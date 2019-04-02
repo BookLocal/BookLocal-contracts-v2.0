@@ -11,8 +11,6 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
     let hotel;
     let roomTypeAddr;
     let roomType;
-    let hotelDB_id = 10;
-    let roomDB_id = 10;
 
     // make a fresh roomType for each call and make sure:
     //    - roomType count and address are stored in hotel
@@ -23,11 +21,11 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
         const inventory = 10;
 
         bookLocal = await BookLocal.new([blWallet],blWallet);
-        await bookLocal.newHotel([hotelWallet], hotelWallet, hotelDB_id);
+        await bookLocal.newHotel([hotelWallet], hotelWallet);
 
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
-        await hotel.addRoomType(price, sleeps, beds, inventory, roomDB_id, {from:hotelWallet});
+        await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
         roomTypeAddr = await hotel.getRoomTypeAddress(0);
         roomType = await RoomType.at(roomTypeAddr);

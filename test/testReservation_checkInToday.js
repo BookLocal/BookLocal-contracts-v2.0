@@ -13,8 +13,6 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     let reservation;
     let checkIn;
     let checkOut;
-    let hotelDB_id = 10;
-    let roomDB_id = 10;
 
     // make a new reservation
     beforeEach('setup reservation', async function() {
@@ -27,12 +25,12 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
         // new booklocal and hotel
         bookLocal = await BookLocal.new([blWallet],blWallet);
-        const newHotelTx = await bookLocal.newHotel([hotelWallet], hotelWallet, hotelDB_id);
+        const newHotelTx = await bookLocal.newHotel([hotelWallet], hotelWallet);
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
 
         // add new room
-        await hotel.addRoomType(price, sleeps, beds, inventory, roomDB_id, {from:hotelWallet});
+        await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
         // set checkIn and checkOut info
         roomTypeAddr = await hotel.getRoomTypeAddress(0);

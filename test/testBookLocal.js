@@ -6,7 +6,6 @@ const utils = require('./utils.js');
 contract('BookLocal', function([blWallet,hotelWallet,guestWallet]) {
 
     let bookLocal;
-    let hotelDB_id = 10;
 
     beforeEach('setup BookLocal', async function() {
         bookLocal = await BookLocal.new([blWallet],blWallet);
@@ -23,7 +22,7 @@ contract('BookLocal', function([blWallet,hotelWallet,guestWallet]) {
     //    - counts hotel
     //    - stores proper hotel address
     it('should track new hotel counts and addresses', async() => {
-        const tx = await bookLocal.newHotel([hotelWallet],hotelWallet, hotelDB_id);
+        const tx = await bookLocal.newHotel([hotelWallet],hotelWallet);
         const hotelAddressFromTx = utils.getAddressFromTxEvent(tx);
         const hotelCount = await bookLocal.getHotelCount();
         const hotelAddressFromBL = await bookLocal.getHotelAddress(1);
