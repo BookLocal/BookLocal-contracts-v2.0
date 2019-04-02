@@ -1,4 +1,6 @@
 # RoomType Interface
+Deploy Gas Used (1st Room): 629,911
+Deploy Gas Used (2nd Room): 614,911
 
 ## Functions
 

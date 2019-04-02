@@ -1,4 +1,6 @@
 # Reservation Interface
+Deploy Gas Used (1st Reservation): 1,290,032
+Deploy Gas Used (2nd Reservation): 1,200,032
 
 ## Events
 ```js

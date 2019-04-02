@@ -1,4 +1,7 @@
 # Hotel Interface
+Deploy Gas Used (1st Hotel): 3,869,515
+Deploy Gas Used (2nd Hotel): 3,854,515
+Deploy Gas Used (3rd Hotel): 3,854,515
 
 ## Events
 ```js

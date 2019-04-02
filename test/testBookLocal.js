@@ -22,7 +22,8 @@ contract('BookLocal', function([blWallet,hotelWallet,guestWallet]) {
     //    - counts hotel
     //    - stores proper hotel address
     it('should track new hotel counts and addresses', async() => {
-        const tx = await bookLocal.newHotel([hotelWallet],hotelWallet);
+        // set upper bound on gas use
+        const tx = await bookLocal.newHotel([hotelWallet],hotelWallet, {gas: 5000000});
         const hotelAddressFromTx = utils.getAddressFromTxEvent(tx);
         const hotelCount = await bookLocal.getHotelCount();
         const hotelAddressFromBL = await bookLocal.getHotelAddress(1);

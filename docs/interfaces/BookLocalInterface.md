@@ -1,4 +1,5 @@
 # BookLocal Interface
+Deploy Gas Used: 6,063,634
 
 ## Events
 ```js
