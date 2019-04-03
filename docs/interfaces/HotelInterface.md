@@ -14,12 +14,12 @@ event NewRoomType(address indexed hotel, address indexed roomType);
 
 ## Functions
 
-#### ERC809 renting
+#### ERC809, renting
 ```js
 function reserve(uint256 _roomType, uint256 _checkIn, uint256 _checkOut) external payable;
-function canAccess(address _reservationAddr, address _potentialGuest) external view returns (bool);
 function closeReservation(address _reservationAddr) senderIsAdmin external;
 function cancelReservation(address _reservationAddr) senderIsAdmin external;
+function canAccess(address _reservationAddr, address _potentialGuest) external view returns (bool);
 function getReservationByCheckInDay(uint256 _day) external view returns (address[]);
 function getReservationByGuestAddr(address _guest) external view returns (address[]);
 ```
@@ -46,6 +46,7 @@ function getNumOfRoomTypes() public view returns (uint256);
 function getRoomTypeAddress(uint256 _type) public view returns (address);
 function getAvailability(uint256 _roomType, uint256 _day) public view returns (uint256);
 function hasAvailability(uint256 _roomType, uint256 _checkIn, uint256 _checkOut) public view returns (bool);
+function getTotalRooms() public view returns (uint256);
 function getCurrentAdjustedTime(uint256 _roomType) public view returns (uint256);
 function getReservationPrice(uint256 _roomType, uint256 _checkIn, uint256 _checkOut) public view returns (uint256 _price);
 ```

@@ -19,5 +19,6 @@ function getNumSleeps() public view returns (uint256);
 function getNumBeds() public view returns (uint256);
 function getRoomTypeInventory() public view returns (uint256);
 function getMinRentTime() public view returns (uint256);
+function getCurrentAdjustedTime() public view returns (uint256);
 function getPrice() public view returns (uint256);
 ```

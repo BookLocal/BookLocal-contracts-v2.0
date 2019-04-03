@@ -17,7 +17,11 @@ contract RoomType {
     uint256 public price;
     uint256 public sleeps;
     uint256 public beds;
-    uint256 public minRentTime = 3600*24;           // minimum time in seconds
+
+    // initial time values
+    bool public timeIsPlusUtc = false; 
+    uint256 public timeShift = 0;            // accounts for time zones 
+    uint256 public minRentTime = 3600*24;    // minimum time in seconds
 
     // availability information
     uint256 public inventory;
@@ -92,6 +96,14 @@ contract RoomType {
         }
     }
 
+    function setTimeZone(uint256 _shift, bool _isForward) 
+        onlyHotel 
+        external 
+    {
+        timeShift = _shift;
+        timeIsPlusUtc = _isForward; 
+    }
+
     function cancelReservation(
         uint256 _checkIn,
         uint256 _checkOut
@@ -146,6 +158,16 @@ contract RoomType {
 
     function getMinRentTime() public view returns (uint256) {
         return minRentTime;
+    }
+
+    function getCurrentAdjustedTime() public view returns (uint256) {
+        uint256 _roomTime; 
+        if (timeIsPlusUtc) {
+            _roomTime = now.add(timeShift).div(minRentTime);
+        } else { 
+            _roomTime = now.sub(timeShift).div(minRentTime);
+        }
+        return _roomTime;
     }
 
     function getPrice() public view returns (uint256) {

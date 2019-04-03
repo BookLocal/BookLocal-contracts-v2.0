@@ -17,7 +17,7 @@ contract BookLocal {
     // Ownership
     address bookLocalWallet;
 
-    address[] bookLocalOwners;
+    address[] public bookLocalOwners;
     mapping (address => bool) isOwner;
 
     // Hotel inventory
@@ -94,14 +94,6 @@ contract BookLocal {
 {
         isOwner[_owner] = false;
         _removeOwner(_owner);
-    }
-
-    function getOwners()
-        external
-        view
-        returns (address[] memory)
-    {
-        return bookLocalOwners;
     }
 
     /**************************************************

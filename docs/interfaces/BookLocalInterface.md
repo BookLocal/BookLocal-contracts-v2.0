@@ -12,12 +12,12 @@ event NewBookLocalWallet(address wallet);
 #### External
 ```js
 function newHotel(address[] _owners, address _wallet) external returns (address hotel);
-
+```
+```js
 function changeWallet(address _newWallet) senderIsOwner external;
 function closeReservation(address _reservationAddr) senderIsOwner external;
 function addOwner(address _owner) senderIsOwner external;
 function removeOwner(address _owner) senderIsOwner external;
-function getOwners() external view returns (address[]);
 ```
 
 #### Public
