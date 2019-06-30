@@ -57,7 +57,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
     // check balance of reservation escrow
     it('should have money in it after a correct call', async() => {
-        const balance = await reservation.getBalance();
+        const balance = await web3.eth.getBalance(reservationAddr);
         assert.equal(balance, 200, "different balance");
     });
 
@@ -72,7 +72,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     // check that only owner can change price
     it('should let hotel owner change price', async() => {
         await hotel.changeReservationPrice(reservationAddr, 75, {from:hotelWallet});
-        assert.equal(await reservation.getPrice(), 75);
+        assert.equal(await reservation.reservationPrice.call(), 75);
     })
 
     it('should not let guest change price by calling through the hotel', async() => {
@@ -93,6 +93,11 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
             const revertFound = error.message.search('revert') >= 0;
             assert(revertFound, `Expected "revert", got ${error} instead`);
         }
+    })
+
+    it('should let hotel owner set the cancellation price', async() => {
+        await hotel.setCancelPrice(reservationAddr, 75, {from:hotelWallet});
+        assert.equal(await reservation.cancelPrice.call(), 75);
     })
 
     it('should update availability after a reservation is made', async() => {

@@ -21,18 +21,18 @@ contract Reservation {
      *  Storage
      */
 
-    address bookLocal;
-    address hotel;
-    address guest;
+    address public bookLocal;
+    address public hotel;
+    address public guest;
 
     uint256 public checkInDate;
     uint256 public checkOutDate;
     address public roomTypeAddr;
 
-    uint256 minRentTime;
-    uint256 reservationPrice;
-    uint256 cancelPrice;
-    uint256 bookLocalPctShare;
+    uint256 public minRentTime;
+    uint256 public reservationPrice;
+    uint256 public cancelPrice;
+    uint256 public bookLocalPctShare;
 
     /**************************************************
      *  Fallback
@@ -129,7 +129,7 @@ contract Reservation {
     function cancelReservation() isInContract beforeCheckIn external {
 
         // for a cancelled room, charge less
-        uint256 _cancelPrice = getCancelPrice();
+        uint256 _cancelPrice = cancelPrice;
 
         uint256 _bookLocalShare = _cancelPrice.div(bookLocalPctShare);
         uint256 _hotelShare = _cancelPrice.sub(_bookLocalShare);
@@ -191,18 +191,15 @@ contract Reservation {
         return address(this).balance;
     }
 
-    function getPrice() public view returns (uint256) {
-        return reservationPrice;
-    }
-
-    function getCancelPrice() public view returns (uint256) {
-        return cancelPrice;
-    }
-
     /**************************************************
      *  Internal
      */
+
     function _setDefaultCancelPrice() internal {
-        cancelPrice = reservationPrice.div(2);
+        uint256 _nights = checkOutDate.sub(checkInDate);
+        require(_nights > 0);
+
+        // cancel price is the price of a single night
+        cancelPrice = reservationPrice.div(_nights);
     }
 }
