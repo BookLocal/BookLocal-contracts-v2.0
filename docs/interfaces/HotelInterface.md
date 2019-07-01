@@ -32,8 +32,11 @@ function addAdmin(address _admin) external;
 function addOwner(address _owner) external;
 function removeAdmin(address _admin) external;
 function removeOwner(address _owner) external;
+
 function changeReservationPrice(address _reservationAddr, uint256 _newPrice) senderIsAdmin external;
+function changeCancelPrice(address _reservationAddr, uint256 _newPrice) senderIsAdmin external;
 function changeRoomTypePrice(address _roomTypeAddr, uint256 _newPrice) senderIsAdmin external;
+
 function getRoomInfo(address _roomTypeAddr) external view returns (uint256 _sleeps, uint256 _beds, uint256 _price, uint256 _inventory);
 function getAdmins() external view returns (address[]);
 function getOwners() external view returns (address[]);

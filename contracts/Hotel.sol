@@ -262,7 +262,7 @@ contract Hotel {
         emit ChangeReservationPrice(_reservationAddr, _newPrice);
     }
 
-    function setCancelPrice(address _reservationAddr, uint256 _newPrice)
+    function changeCancelPrice(address _reservationAddr, uint256 _newPrice)
         senderIsAdmin
         external
     {

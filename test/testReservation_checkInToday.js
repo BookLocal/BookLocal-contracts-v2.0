@@ -96,7 +96,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     })
 
     it('should let hotel owner set the cancellation price', async() => {
-        await hotel.setCancelPrice(reservationAddr, 75, {from:hotelWallet});
+        await hotel.changeCancelPrice(reservationAddr, 75, {from:hotelWallet});
         assert.equal(await reservation.cancelPrice.call(), 75);
     })
 
