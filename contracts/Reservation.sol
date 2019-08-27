@@ -65,7 +65,7 @@ contract Reservation {
         hotel = _hotel;
         guest = _guest;
         checkInDate = _checkIn;
-        checkOutDate = _checkOut; 
+        checkOutDate = _checkOut;
         reservationPrice = _reservationPrice;
         minRentTime = _minRentTime;
         bookLocalPctShare = 25;    // 1/25 th of reservation price
@@ -102,7 +102,7 @@ contract Reservation {
      *  External
      */
 
-    function checkOut() isInContract afterCheckIn external {
+    function checkOut() external isInContract afterCheckIn {
 
         uint256 _bookLocalShare = reservationPrice.div(bookLocalPctShare);
         uint256 _hotelShare = reservationPrice.sub(_bookLocalShare);
@@ -126,7 +126,7 @@ contract Reservation {
         selfdestruct(hotel);
     }
 
-    function cancelReservation() isInContract beforeCheckIn external {
+    function cancelReservation() external isInContract beforeCheckIn {
 
         // for a cancelled room, charge less
         uint256 _cancelPrice = cancelPrice;
@@ -165,11 +165,11 @@ contract Reservation {
         return (_guest == guest && _adjustedCurrentTime >= checkInDate);
     }
 
-    function changePrice(uint256 _newPrice) onlyHotel external {
+    function changePrice(uint256 _newPrice) external onlyHotel {
         reservationPrice = _newPrice;
     }
 
-    function changeCancelPrice(uint256 _newPrice) onlyHotel external {
+    function changeCancelPrice(uint256 _newPrice) external onlyHotel {
         cancelPrice = _newPrice;
     }
 
@@ -179,12 +179,12 @@ contract Reservation {
 
     function getBookLocalWallet() public view returns (address) {
         BookLocal _bookLocal = BookLocal(bookLocal);
-        return _bookLocal.getWallet();
+        return _bookLocal.bookLocalWallet();
     }
 
     function getHotelWallet() public view returns (address) {
         Hotel _hotel = Hotel(hotel);
-        return _hotel.getWallet();
+        return _hotel.hotelWallet();
     }
 
     /**************************************************

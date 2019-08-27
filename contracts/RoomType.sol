@@ -19,8 +19,8 @@ contract RoomType {
     uint256 public beds;
 
     // initial time values
-    bool public timeIsPlusUtc = false; 
-    uint256 public timeShift = 0;            // accounts for time zones 
+    bool public timeIsPlusUtc = false;
+    uint256 public timeShift = 0;            // accounts for time zones
     uint256 public minRentTime = 3600*24;    // minimum time in seconds
 
     // availability information
@@ -73,8 +73,8 @@ contract RoomType {
      */
 
     function changePrice(uint256 _newPrice)
-        onlyHotel
         external
+        onlyHotel
     {
         price = _newPrice;
     }
@@ -84,8 +84,8 @@ contract RoomType {
         uint256 _checkIn,
         uint256 _checkOut
     )
-        onlyHotel
         external
+        onlyHotel
     {
         isReservation[_reservation] = true;
         checkIns[_checkIn] ++;
@@ -96,25 +96,25 @@ contract RoomType {
         }
     }
 
-    function setTimeZone(uint256 _shift, bool _isForward) 
-        onlyHotel 
-        external 
+    function setTimeZone(uint256 _shift, bool _timeIsPlusUtc)
+        external
+        onlyHotel
     {
         timeShift = _shift;
-        timeIsPlusUtc = _isForward; 
+        timeIsPlusUtc = _timeIsPlusUtc;
     }
 
     function cancelReservation(
         uint256 _checkIn,
         uint256 _checkOut
     )
-        onlyReservation
         external
+        onlyReservation
     {
         checkIns[_checkIn] --;
         checkOuts[_checkOut] --;
 
-        for (uint i=_checkIn; i<_checkOut; i++) {
+        for (uint i = _checkIn; i<_checkOut; i++) {
             occupied[i] --;
         }
     }
@@ -144,33 +144,13 @@ contract RoomType {
         return _available;
     }
 
-    function getNumSleeps() public view returns (uint256) {
-        return sleeps;
-    }
-
-    function getNumBeds() public view returns (uint256) {
-        return beds;
-    }
-
-    function getRoomTypeInventory() public view returns (uint256) {
-        return inventory;
-    }
-
-    function getMinRentTime() public view returns (uint256) {
-        return minRentTime;
-    }
-
     function getCurrentAdjustedTime() public view returns (uint256) {
-        uint256 _roomTime; 
+        uint256 _roomTime;
         if (timeIsPlusUtc) {
             _roomTime = now.add(timeShift).div(minRentTime);
-        } else { 
+        } else {
             _roomTime = now.sub(timeShift).div(minRentTime);
         }
         return _roomTime;
-    }
-
-    function getPrice() public view returns (uint256) {
-        return price;
     }
 }

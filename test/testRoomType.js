@@ -23,24 +23,24 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
         bookLocal = await BookLocal.new([blWallet],blWallet);
         await bookLocal.newHotel([hotelWallet], hotelWallet);
 
-        hotelAddress = await bookLocal.getHotelAddress(1);
+        hotelAddress = await bookLocal.hotelRegistry(0);
         hotel = await Hotel.at(hotelAddress);
         await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
-        roomTypeAddr = await hotel.getRoomTypeAddress(0);
+        roomTypeAddr = await hotel.roomTypes(0);
         roomType = await RoomType.at(roomTypeAddr);
         assert.ok(roomType);
     })
 
     // make sure the price is correct
     it('should have the correct price', async() => {
-        const price = await roomType.getPrice();
+        const price = await roomType.price.call();
         assert.equal(price, 100, "wrong price");
     })
 
     // make sure inventory is correct and available
     it('should have the correct inventory and availability', async() => {
-        const inventory = await roomType.getRoomTypeInventory();
+        const inventory = await roomType.inventory.call();
         const available = await roomType.getAvailability(1);
         assert.equal(inventory, 10, "wrong inventory");
         assert.equal(inventory.toNumber(), available.toNumber(), "wrong availability");
@@ -48,7 +48,7 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
 
     it('should let hotel change price', async() => {
         await hotel.changeRoomTypePrice(roomTypeAddr, 75,{from:hotelWallet});
-        const price = await roomType.getPrice();
+        const price = await roomType.price.call();
         assert.equal(price, 75);
     })
 
@@ -73,8 +73,8 @@ contract('RoomType', function([blWallet,hotelWallet,guestWallet]) {
     })
 
     it('should let you get room type information', async() => {
-        const price = await roomType.getPrice();
-        const sleeps = await roomType.getNumSleeps();
+        const price = await roomType.price.call();
+        const sleeps = await roomType.sleeps.call();
         assert.equal(price.toNumber(), 100);
         assert.equal(sleeps.toNumber(), 2);
     })

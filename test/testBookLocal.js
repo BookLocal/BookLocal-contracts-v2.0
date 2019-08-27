@@ -9,12 +9,14 @@ contract('BookLocal', function([blWallet,hotelWallet,guestWallet,serverAddr]) {
 
     beforeEach('setup BookLocal', async function() {
         bookLocal = await BookLocal.new([blWallet],blWallet);
+        let receipt = await web3.eth.getTransactionReceipt(bookLocal.transactionHash);
+        console.log("Total gas used on deploy: " + receipt.gasUsed)
         assert.ok(bookLocal);
     })
 
     // make sure money is sent to the right place!
     it('should have the correct wallet', async() => {
-        const wallet = await bookLocal.getWallet();
+        const wallet = await bookLocal.bookLocalWallet.call();
         assert.equal(wallet, blWallet, "wrong wallet");
     })
 
@@ -22,14 +24,10 @@ contract('BookLocal', function([blWallet,hotelWallet,guestWallet,serverAddr]) {
     //    - counts hotel
     //    - stores proper hotel address
     it('should track new hotel counts and addresses', async() => {
-        // set upper bound on gas use
         const tx = await bookLocal.newHotel([hotelWallet],hotelWallet, {gas: 5000000});
         const hotelAddressFromTx = utils.getAddressFromTxEvent(tx);
-        const hotelCount = await bookLocal.getHotelCount();
-        const hotelAddressFromBL = await bookLocal.getHotelAddress(1);
-
-        assert.equal(hotelCount, 1, "no new hotel");
-        assert.equal(hotelAddressFromTx, hotelAddressFromBL, "different addresses");
+        const hotel = await bookLocal.hotelRegistry(0);    // access public array this way 
+        assert.equal(hotel, hotelAddressFromTx, "different addresses");
     })
 
     it('should let me add a new BookLocal server', async() => {

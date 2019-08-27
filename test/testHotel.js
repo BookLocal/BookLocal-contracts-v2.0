@@ -15,21 +15,19 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet,blServerAddr]) {
         bookLocal = await BookLocal.new([blWallet],blWallet);
         await bookLocal.addServer(blServerAddr);
         await bookLocal.newHotel([hotelWallet], hotelWallet);
-        hotelAddress = await bookLocal.getHotelAddress(1);
+        hotelAddress = await bookLocal.hotelRegistry(0);
         hotel = await Hotel.at(hotelAddress);
         assert.ok(hotel);
     })
 
     it('should have the correct wallet', async() => {
-        const walletFromContract = await hotel.getWallet();
+        const walletFromContract = await hotel.hotelWallet.call();
         assert.equal(walletFromContract, hotelWallet);
     })
 
     it('should only let hotel owner create inventory', async () => {
         await hotel.addRoomType(100,2,1,10,{from:hotelWallet});
-        const roomTypeCount = await hotel.getNumOfRoomTypes();
         const roomCount = await hotel.getTotalRooms();
-        assert.equal(roomTypeCount, 1);
         assert.equal(roomCount, 10);
     })
 

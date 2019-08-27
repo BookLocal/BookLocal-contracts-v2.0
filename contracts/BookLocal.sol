@@ -15,18 +15,18 @@ contract BookLocal {
      */
 
     // Ownership
-    address bookLocalWallet;
+    address public bookLocalWallet;
+    address public bookLocalServer;
 
-    address[] public bookLocalOwners;
-    mapping (address => bool) isOwner;
+    mapping (address => bool) public isOwner;
 
     // Hotel inventory
-    uint256 totalHotels;
-    mapping (uint256 => address) public hotelRegistry;
+    address[] public hotelRegistry;
 
     /**************************************************
      *  Constructor
      */
+
     constructor(address[] memory _owners, address _wallet) public {
 
         uint256 numOwners = _owners.length;
@@ -37,7 +37,6 @@ contract BookLocal {
         }
 
         bookLocalWallet = _wallet;
-        bookLocalOwners = _owners;
     }
 
     /**************************************************
@@ -66,86 +65,47 @@ contract BookLocal {
         _registerHotel(hotel);
     }
 
-    function changeWallet(address _newWallet) senderIsOwner external {
+    function changeWallet(address _newWallet) external senderIsOwner {
         bookLocalWallet = _newWallet;
         emit NewBookLocalWallet(_newWallet);
     }
 
     function closeReservation(address _reservationAddr)
-        senderIsOwner
         external
+        senderIsOwner
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.checkOut();
     }
 
     function addOwner(address _owner)
-        senderIsOwner
         external
-{
+        senderIsOwner
+    {
         require(!isOwner[_owner] && _owner != address(0));
         isOwner[_owner] = true;
-        bookLocalOwners.push(_owner);
     }
 
     function removeOwner(address _owner)
-        senderIsOwner
         external
-{
+        senderIsOwner
+    {
         isOwner[_owner] = false;
-        _removeOwner(_owner);
     }
 
-    /**************************************************
-     *  Public
-     */
-    function getHotelCount() public view returns (uint256) {
-        return totalHotels;
-    }
-
-    function getHotelAddress(uint256 _hotelId) public view returns (address) {
-        return hotelRegistry[_hotelId];
-    }
-
-    function getWallet() public view returns (address) {
-        return bookLocalWallet;
+    function addServer(address _server)
+        external
+        senderIsOwner
+    {
+        bookLocalServer = _server;
     }
 
     /**************************************************
      *  Internal
      */
-    function _incrementHotelCount() internal returns (uint256) {
-        totalHotels++;
-        return totalHotels;
-    }
-
+    
     function _registerHotel(address _hotel) internal {
-        uint256 hotelId = _incrementHotelCount();
-        hotelRegistry[hotelId] = _hotel;
+        hotelRegistry.push(_hotel);
         emit NewHotelCreated(_hotel);
-    }
-
-    function _removeOwner(address _address) internal {
-
-        uint256 _index;
-        uint256 _numOwners = bookLocalOwners.length;
-
-        for (uint i=0; i<_numOwners; i++) {
-            if (_address == bookLocalOwners[i]) {
-                _index = i;
-            }
-        }
-        _removeIndex(_index, bookLocalOwners);
-
-    }
-
-    function _removeIndex(uint256 _index, address[] storage _addrList) internal {
-        require(_index <= _addrList.length-1);
-
-        for (uint i = _index; i<_addrList.length-1; i++){
-            _addrList[i] = _addrList[i+1];
-        }
-        delete _addrList[_addrList.length-1];
-        _addrList.length--;
     }
 }

@@ -28,14 +28,14 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
         await bookLocal.addServer(blServer);
         bookLocalServer = await bookLocal.bookLocalServer.call();
         const newHotelTx = await bookLocal.newHotel([hotelWallet], hotelWallet);
-        hotelAddress = await bookLocal.getHotelAddress(1);
+        hotelAddress = await bookLocal.hotelRegistry(0);
         hotel = await Hotel.at(hotelAddress);
 
         // add new room
         await hotel.addRoomType(price, sleeps, beds, inventory, {from:hotelWallet});
 
         // set checkIn and checkOut info
-        roomTypeAddr = await hotel.getRoomTypeAddress(0);
+        roomTypeAddr = await hotel.roomTypes(0);
         checkIn = await hotel.getCurrentAdjustedTime(roomTypeAddr);
         checkIn = checkIn.toNumber();
         checkOut = checkIn + 2;
@@ -60,7 +60,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
     it('should allow the bookLocal server to make a reservation without any money', async() => {
         await hotel.reserve(roomTypeAddr, checkIn, checkOut, {from:bookLocalServer})
-        assert.success('expected success')
+        assert.ok('expected success')
     })
 
     // check balance of reservation escrow

@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import './BookLocal.sol';
 import './Reservation.sol';
 import './RoomType.sol';
 
@@ -23,24 +24,20 @@ contract Hotel {
      */
 
     // BookLocal contract, NOT the wallet.
-    address bookLocal;
+    address public bookLocal;
 
     // Ownership
-    address hotelWallet;
+    address public hotelWallet;
 
-    address[] hotelOwners;
     mapping (address => bool) isOwner;
-
-    address[] hotelAdmins;
     mapping (address => bool) isAdmin;
 
     // Inventory
-    address[] roomTypes;
-    uint256 totalInventory;
+    address[] public roomTypes;
 
     // Reservations
-    mapping (address => address[]) reservationsByGuest;
-    mapping (uint256 => address[]) reservationsByCheckIn;
+    mapping (address => address[]) public reservationsByGuest;
+    mapping (uint256 => address[]) public reservationsByCheckIn;
 
     /**************************************************
      *  Constructor
@@ -61,7 +58,6 @@ contract Hotel {
         }
 
         hotelWallet = _wallet;
-        hotelOwners = _owners;
         bookLocal = _bookLocal;
     }
 
@@ -103,10 +99,13 @@ contract Hotel {
     {
         RoomType _room = RoomType(_roomTypeAddr);
 
-        // make sure renter sends enough money
+        // make sure renter sends enough money OR is from BookLocal
         // this function also checks that checkout is after checkin
-        uint256 _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
-        require(msg.value >= _price);
+        address _bookLocalServer = getBookLocalServer();
+        if (msg.sender != _bookLocalServer) {
+            uint256 _price = _calculateReservationPrice(_room, _checkIn, _checkOut);
+            require(msg.value >= _price);
+        }
 
         // make sure there is availability
         // and that check in is in the future
@@ -116,7 +115,7 @@ contract Hotel {
         address _bookLocal = bookLocal;
         address _hotel = address(this);
         address _guest = msg.sender;
-        uint256 _minRentTime = _room.getMinRentTime();
+        uint256 _minRentTime = _room.minRentTime();
 
         // make new Reservation
         // transfer the money to the new address
@@ -139,16 +138,16 @@ contract Hotel {
     }
 
     function closeReservation(address _reservationAddr)
-        senderIsAdmin
         external
+        senderIsAdmin
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.checkOut();
     }
 
     function cancelReservation(address _reservationAddr)
-        senderIsAdmin
         external
+        senderIsAdmin
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.cancelReservation();
@@ -190,10 +189,10 @@ contract Hotel {
         uint256 _inventory)
     {
         RoomType _room = RoomType(_roomTypeAddr);
-        _sleeps = _room.getNumSleeps();
-        _beds = _room.getNumBeds();
-        _price = _room.getPrice();
-        _inventory = _room.getRoomTypeInventory();
+        _sleeps = _room.sleeps();
+        _beds = _room.beds();
+        _price = _room.price();
+        _inventory = _room.inventory();
     }
 
     /* owner only */
@@ -204,58 +203,54 @@ contract Hotel {
         uint256 _beds,
         uint256 _inventory
     )
-        senderIsOwner
         external
+        senderIsOwner
     {
         address _hotel = address(this);
         address _roomTypeAddr = new RoomType(_hotel, _price, _sleeps, _beds, _inventory);
         _recordRoomType(_roomTypeAddr);
     }
 
-    function changeWallet(address _newWallet) senderIsOwner external {
+    function changeWallet(address _newWallet) external senderIsOwner {
         hotelWallet = _newWallet;
         emit NewHotelWallet(_newWallet);
     }
 
     function addAdmin(address _admin)
-        senderIsOwner
         external
+        senderIsOwner
     {
         require(!isAdmin[_admin] && _admin != address(0));
         isAdmin[_admin] = true;
-        hotelAdmins.push(_admin);
     }
 
     function addOwner(address _owner)
-        senderIsOwner
         external
+        senderIsOwner
     {
         require(!isOwner[_owner] && _owner != address(0));
         isOwner[_owner] = true;
-        hotelOwners.push(_owner);
     }
 
     function removeAdmin(address _admin)
-        senderIsOwner
         external
+        senderIsOwner
     {
         isAdmin[_admin] = false;
-        _removeAdmin(_admin);
     }
 
     function removeOwner(address _owner)
-        senderIsOwner
         external
+        senderIsOwner
     {
         isOwner[_owner] = false;
-        _removeOwner(_owner);
     }
 
     /* admin only */
 
     function changeReservationPrice(address _reservationAddr, uint256 _newPrice)
-        senderIsAdmin
         external
+        senderIsAdmin
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.changePrice(_newPrice);
@@ -263,48 +258,29 @@ contract Hotel {
     }
 
     function changeCancelPrice(address _reservationAddr, uint256 _newPrice)
-        senderIsAdmin
         external
+        senderIsAdmin
     {
         Reservation _reservation = Reservation(_reservationAddr);
         _reservation.changeCancelPrice(_newPrice);
     }
 
     function changeRoomTypePrice(address _roomTypeAddr, uint256 _newPrice)
-        senderIsAdmin
         external
+        senderIsAdmin
     {
         RoomType _roomType = RoomType(_roomTypeAddr);
         _roomType.changePrice(_newPrice);
         emit ChangeRoomPrice(_roomTypeAddr, _newPrice);
     }
 
-    function getAdmins()
-        external
-        view
-        returns (address[] memory)
-    {
-        return hotelAdmins;
-    }
-
-    function getOwners()
-        external
-        view
-        returns (address[] memory)
-    {
-        return hotelOwners;
-    }
-
     /**************************************************
      *  Public
      */
 
-    function getWallet() public view returns (address) {
-        return hotelWallet;
-    }
-
-    function getNumOfRoomTypes() public view returns (uint256) {
-        return roomTypes.length;
+    function getBookLocalServer() public view returns (address) {
+        BookLocal _bl = BookLocal(bookLocal);
+        return _bl.bookLocalServer();
     }
 
     function getRoomTypeAddress(uint256 _type) public view returns (address) {
@@ -342,7 +318,7 @@ contract Hotel {
     }
 
     function getTotalRooms() public view returns (uint256) {
-        uint256 _totalRoomTypes = getNumOfRoomTypes();
+        uint256 _totalRoomTypes = roomTypes.length;
         uint256 _totalRooms;
         address _roomTypeAddr;
         RoomType _room;
@@ -351,7 +327,7 @@ contract Hotel {
             _roomTypeAddr = roomTypes[i];
             _room = RoomType(_roomTypeAddr);
 
-            _totalRooms += _room.getRoomTypeInventory();
+            _totalRooms += _room.inventory();
         }
         return _totalRooms;
     }
@@ -360,7 +336,7 @@ contract Hotel {
         public
         view
         returns (uint256)
-    { 
+    {
         RoomType _room = RoomType(_roomTypeAddr);
         return _room.getCurrentAdjustedTime();
     }
@@ -381,6 +357,7 @@ contract Hotel {
     /**************************************************
      *  Internal
      */
+
     function _recordReservation(
         address _reservation,
         address _guest,
@@ -422,43 +399,7 @@ contract Hotel {
         returns (uint256)
     {
         uint256 _lengthOfStay = _lengthOfReservation(_checkIn, _checkOut);
-        uint256 _pricePerNight = _room.getPrice();
+        uint256 _pricePerNight = _room.price();
         return _pricePerNight.mul(_lengthOfStay);
-    }
-
-    function _removeOwner(address _address) internal {
-
-        uint256 _index;
-        uint256 _numOwners = hotelOwners.length;
-
-        for (uint i=0; i<_numOwners; i++) {
-            if (_address == hotelOwners[i]) {
-                _index = i;
-            }
-        }
-        _removeIndex(_index, hotelOwners);
-    }
-
-    function _removeAdmin(address _address) internal {
-
-        uint256 _index;
-        uint256 _numAdmins = hotelAdmins.length;
-
-        for (uint i=0; i<_numAdmins; i++) {
-            if (_address == hotelAdmins[i]) {
-                _index = i;
-            }
-        }
-        _removeIndex(_index, hotelAdmins);
-    }
-
-    function _removeIndex(uint256 _index, address[] storage _addrList) internal {
-        require(_index <= _addrList.length-1);
-
-        for (uint i = _index; i<_addrList.length-1; i++){
-            _addrList[i] = _addrList[i+1];
-        }
-        delete _addrList[_addrList.length-1];
-        _addrList.length--;
     }
 }
