@@ -3,7 +3,7 @@ var Hotel = artifacts.require('Hotel');
 var RoomType = artifacts.require('RoomType');
 var Reservation = artifacts.require('Reservation');
 
-contract('Reservation with checkIn date today', function([blWallet,hotelWallet,guestWallet,attacker]) {
+contract('Reservation with checkIn date today', function([blWallet,hotelWallet,guestWallet,attacker,blServer]) {
 
     let bookLocal;
     let hotelAddress;
@@ -25,6 +25,8 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
         // new booklocal and hotel
         bookLocal = await BookLocal.new([blWallet],blWallet);
+        await bookLocal.addServer(blServer);
+        bookLocalServer = await bookLocal.bookLocalServer.call();
         const newHotelTx = await bookLocal.newHotel([hotelWallet], hotelWallet);
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
@@ -35,11 +37,12 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
         // set checkIn and checkOut info
         roomTypeAddr = await hotel.getRoomTypeAddress(0);
         checkIn = await hotel.getCurrentAdjustedTime(roomTypeAddr);
-        checkOut = checkIn.toNumber() + 2;
+        checkIn = checkIn.toNumber();
+        checkOut = checkIn + 2;
 
         // make reservation and get it's info
-        await hotel.reserve(roomTypeAddr, checkIn.toNumber(), checkOut, {from:guestWallet, value:200});
-        const reservations = await hotel.getReservationByCheckInDay(checkIn.toNumber());
+        await hotel.reserve(roomTypeAddr, checkIn, checkOut, {from:guestWallet, value:200});
+        const reservations = await hotel.getReservationByCheckInDay(checkIn);
         reservationAddr = reservations[0];
         reservation = await Reservation.at(reservationAddr);
         assert.ok(reservation);
@@ -47,12 +50,17 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
 
     it("should fail if you don't send enough money", async() => {
         try {
-            await hotel.reserve(roomTypeAddr, checkIn.toNumber(), checkOut, {from:guestWallet, value:100});
+            await hotel.reserve(roomTypeAddr, checkIn, checkOut, {from:guestWallet, value:100});
             assert.fail('expected revert');
         } catch (error) {
             const revertFound = error.message.search('revert') >= 0;
             assert(revertFound, `Expected "revert", got ${error} instead`);
         }
+    })
+
+    it('should allow the bookLocal server to make a reservation without any money', async() => {
+        await hotel.reserve(roomTypeAddr, checkIn, checkOut, {from:bookLocalServer})
+        assert.success('expected success')
     })
 
     // check balance of reservation escrow
@@ -101,7 +109,7 @@ contract('Reservation with checkIn date today', function([blWallet,hotelWallet,g
     })
 
     it('should update availability after a reservation is made', async() => {
-        const availability = await hotel.getAvailability(roomTypeAddr, checkIn.toNumber());
+        const availability = await hotel.getAvailability(roomTypeAddr, checkIn);
         assert.equal(availability, 9);
     })
 

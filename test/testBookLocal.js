@@ -3,7 +3,7 @@ var Hotel = artifacts.require('Hotel');
 
 const utils = require('./utils.js');
 
-contract('BookLocal', function([blWallet,hotelWallet,guestWallet]) {
+contract('BookLocal', function([blWallet,hotelWallet,guestWallet,serverAddr]) {
 
     let bookLocal;
 
@@ -30,5 +30,11 @@ contract('BookLocal', function([blWallet,hotelWallet,guestWallet]) {
 
         assert.equal(hotelCount, 1, "no new hotel");
         assert.equal(hotelAddressFromTx, hotelAddressFromBL, "different addresses");
+    })
+
+    it('should let me add a new BookLocal server', async() => {
+        await bookLocal.addServer(serverAddr, {from:blWallet});
+        _server = await bookLocal.bookLocalServer.call();
+        assert.equal(_server, serverAddr, 'Server address not set.')
     })
 })

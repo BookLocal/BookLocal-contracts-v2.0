@@ -4,7 +4,7 @@ var RoomType = artifacts.require('RoomType');
 
 const utils = require('./utils.js');
 
-contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
+contract('Hotel', function([blWallet,hotelWallet,guestWallet,blServerAddr]) {
 
     let bookLocal;
     let hotelAddress;
@@ -13,6 +13,7 @@ contract('Hotel', function([blWallet,hotelWallet,guestWallet]) {
 
     beforeEach('setup Hotel', async function() {
         bookLocal = await BookLocal.new([blWallet],blWallet);
+        await bookLocal.addServer(blServerAddr);
         await bookLocal.newHotel([hotelWallet], hotelWallet);
         hotelAddress = await bookLocal.getHotelAddress(1);
         hotel = await Hotel.at(hotelAddress);
