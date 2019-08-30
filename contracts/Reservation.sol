@@ -161,7 +161,8 @@ contract Reservation {
         view
         returns (bool)
     {
-        uint256 _adjustedCurrentTime = now.div(minRentTime);
+        RoomType _room = RoomType(roomTypeAddr);
+        uint256 _adjustedCurrentTime = _room.getCurrentAdjustedTime();
         return (_guest == guest && _adjustedCurrentTime >= checkInDate);
     }
 
